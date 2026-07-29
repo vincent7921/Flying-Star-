@@ -1,0 +1,1816 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>紫白飛星九宮圖</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.21/vue.global.prod.min.js"></script>
+  <style>
+    /* 全域 CSS 變數：設定主要的配色系統與字體族群，方便統一修改 */
+    :root {
+      --ink: #2b2620;
+      /* 深墨色：用於一般文字及九宮格數字 */
+      --ink-soft: #6b5f4d;
+      /* 淺墨色：用於次要的說明文字 */
+      --paper: #f3ead6;
+      /* 紙張底色：網頁與九宮格的主要淺金黃底色 */
+      --paper-deep: #e7d9b8;
+      /* 深紙色：用於九宮格中心（中宮）的背景色 */
+      --paper-line: #cdbb92;
+      /* 紙張格線色：九宮格內部的細線顏色 */
+      --cinnabar: #d80b0f;
+      /* 朱砂紅：用於座山文字、中宮文字、啟用的按鈕等強調色 */
+      --cinnabar-deep: #d80b0f;
+      /* 深朱砂紅：用於漸層底線或深色朱砂強調 */
+      --brass: #b6924f;
+      /* 黃銅色：用於外框線與按鈕懸停邊框色 */
+      --brass-soft: #d8c290;
+      /* 淺黃銅色：用於裝飾性的文字或邊框 */
+      --purple: #8a6bb5;
+      /* 紫（呼應「紫白飛星」）：用於流年星的強調色，與大運星（朱砂紅）、宅命星（墨色）區隔 */
+      --indigo: #5b6bab;
+      /* 靛藍：僅用於五行生剋圖中的數字分組配色，與流年紫、大運紅區隔，避免語意混淆 */
+      --bg: #14110d;
+      /* 網頁主背景色（極深褐色） */
+      --bg-vignette: #1d1811;
+      /* 網頁主背景的漸層中心色 */
+      --font-display: "Noto Serif TC", "Songti TC", "PMingLiU", "STSong", serif;
+      /* 標題與飛星數字使用的明體/宋體字型 */
+      --font-ui: -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+      /* 一般 UI 介面與按鈕使用的無襯線字型 */
+    }
+
+    /* 基本重設：確保所有元素的外距、內距計算方式一致 */
+    * {
+      box-sizing: border-box;
+    }
+
+    /* 網頁整體版面與背景設定 */
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      /* 徑向漸層背景，營造古典莊嚴的暗色調氛圍 */
+      background:
+        radial-gradient(ellipse at 50% -10%, var(--bg-vignette) 0%, var(--bg) 60%),
+        var(--bg);
+      color: var(--ink);
+      font-family: var(--font-ui);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 48px 16px 72px;
+      /* 網頁四周的間距 */
+    }
+
+    /* Vue 掛載點容器 */
+    #app {
+      width: 100%;
+    }
+
+    /* 應用程式主舞台：限制最大寬度並置中 */
+    .stage {
+      width: 100%;
+      max-width: 660px;
+      margin: 0 auto;
+    }
+
+    /* ---------- 上方標題區 ---------- */
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    /* 標題上方的小字裝飾 */
+    .eyebrow {
+      font-family: var(--font-ui);
+      font-size: 11px;
+      /* 字體大小 */
+      letter-spacing: 0.35em;
+      /* 字距 */
+      color: var(--brass-soft);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    /* 主標題：紫白飛星九宮圖 */
+    .title {
+      font-family: var(--font-display);
+      font-size: 34px;
+      /* 字體大小 */
+      font-weight: 600;
+      color: var(--paper);
+      letter-spacing: 0.14em;
+      margin: 0;
+    }
+
+    /* 副標題 */
+    .subtitle {
+      margin-top: 8px;
+      font-size: 13px;
+      /* 字體大小 */
+      color: #a89a7d;
+      letter-spacing: 0.08em;
+    }
+
+    /* ---------- 羅盤與外圍方位區 ---------- */
+    /* 羅盤外圍包裝器：維持 1:1 的正方形比例 */
+    .compass-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 660px;
+      aspect-ratio: 1/1;
+      margin: 0 auto;
+    }
+
+    /* 後方 SVG 裝飾環的絕對定位 */
+    .ring-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 羅盤的網格版面：包含外圍八方位文字與中間的九宮格 */
+    .compass-grid {
+      position: absolute;
+      inset: 2%;
+      /* 羅盤網格的向內縮進量，調小以將整體範圍擴大 */
+      display: grid;
+      /* 網格比例設定：外圍方位寬度佔 0.4fr，中間九宮格放大佔 3.2fr */
+      grid-template-columns: 0.4fr 3.2fr 0.4fr;
+      grid-template-rows: 0.4fr 3.2fr 0.4fr;
+    }
+
+    /* 外圍方位單元格（例如：東、南、西、北等方位文字格） */
+    .dir-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      transition: color .25s ease;
+    }
+
+    /* 方位單元格的主文字（如「北」） */
+    .dir-cell .dir-main {
+      font-family: var(--font-display);
+      font-size: clamp(20px, 10vw, 18px);
+      /* 響應式字體大小 */
+      letter-spacing: 0.05em;
+      color: #e4d3ab;
+    }
+
+    /* 方位單元格的次文字（如「坎水」卦名五行） */
+    .dir-cell .dir-sub {
+      font-family: var(--font-ui);
+      font-size: clamp(12px, 1.6vw, 11px);
+      /* 響應式字體大小 */
+      letter-spacing: 0.1em;
+      color: var(--brass-soft);
+      opacity: .85;
+    }
+
+    /* 座山方位的特殊強調樣式（顯示為紅色朱砂色） */
+    .dir-cell.is-sitting .dir-main {
+      color: var(--cinnabar);
+      font-weight: 700;
+    }
+
+    .dir-cell.is-sitting .dir-sub {
+      color: var(--cinnabar);
+      opacity: 1;
+    }
+
+    /* 向山（朝向）方位的強調樣式（顯示為亮紙色） */
+    .dir-cell.is-facing .dir-main {
+      color: var(--paper);
+      font-weight: 700;
+    }
+
+    .dir-cell.is-facing .dir-sub {
+      color: var(--paper);
+      opacity: .7;
+    }
+
+    /* 中間九宮格容器的格線定位 */
+    .grid-center {
+      grid-column: 2;
+      grid-row: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ---------- 中間九宮格主體 ---------- */
+    .nine-grid {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 1/1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      /* 均分 3 欄 */
+      grid-template-rows: repeat(3, 1fr);
+      /* 均分 3 列 */
+      background: var(--paper);
+      border: 1.5px solid var(--brass);
+      /* 黃銅色外邊框 */
+      box-shadow: 0 10px 30px -8px rgba(0, 0, 0, .65), inset 0 0 0 1px rgba(0, 0, 0, .04);
+      position: relative;
+    }
+
+    /* 將紅線融入九宮格底部的座山方向邊框（使用 CSS 偽元素實現漸層紅線） */
+    .nine-grid::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      /* 貼合在底邊框上 */
+      left: -1.5px;
+      right: -1.5px;
+      height: 8px;
+      /* 紅線粗細 */
+      background: linear-gradient(90deg, transparent, var(--cinnabar) 15%, var(--cinnabar-deep) 50%, var(--cinnabar) 85%, transparent);
+      border-radius: 2px;
+      pointer-events: none;
+    }
+
+    /* 九宮格單個宮位單元格：同時顯示「流年星」、「大運星」與「宅命星」 */
+    .cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      border: 0.5px solid var(--paper-line);
+      /* 宮位間的分隔細線 */
+      background: var(--paper);
+      position: relative;
+      aspect-ratio: 1/1;
+    }
+
+    .cell-row-header,
+    .cell-row-value {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      padding: 0 2px;
+    }
+
+    .cell-row-header {
+      font-family: var(--font-ui);
+      font-size: clamp(9px, 1.6vw, 11px);
+      color: var(--ink-soft);
+      letter-spacing: 0.02em;
+    }
+
+    .cell-row-value {
+      font-family: var(--font-display);
+      font-size: clamp(16px, 3.8vw, 24px);
+      font-weight: 700;
+    }
+
+    .cell-row-header span,
+    .cell-row-value span {
+      width: 33%;
+      text-align: center;
+    }
+
+    .star-red {
+      color: var(--cinnabar) !important;
+    }
+
+    .star-black {
+      color: var(--ink) !important;
+    }
+
+    /* 中宮特別強調：底色略深，提示此格為運星入中之處 */
+    .cell.is-center {
+      background: var(--paper-deep);
+    }
+
+    /* ---------- 大運選擇列 ---------- */
+    .period-selector {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin: 0 auto 22px;
+      max-width: 620px;
+    }
+
+    .period-btn {
+      font-family: var(--font-display);
+      font-size: 14px;
+      letter-spacing: 0.05em;
+      padding: 7px 13px;
+      border-radius: 3px;
+      border: 1px solid #3a3327;
+      background: #1c1812;
+      color: #cbbb96;
+      cursor: pointer;
+      transition: all .18s ease;
+    }
+
+    .period-btn:hover {
+      border-color: var(--brass);
+      color: var(--paper);
+    }
+
+    .period-btn.active {
+      background: var(--cinnabar);
+      border-color: var(--cinnabar);
+      color: #fbeee0;
+      box-shadow: 0 0 0 1px rgba(216, 11, 15, 0.35), 0 4px 14px -4px rgba(216, 11, 15, 0.6);
+    }
+
+    /* 大運說明文字（例如：九運入中宮） */
+    .period-note {
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--brass-soft);
+      letter-spacing: 0.08em;
+      margin: -12px auto 20px;
+    }
+
+    .period-note .accent {
+      color: var(--cinnabar);
+      font-weight: 700;
+    }
+
+    /* ---------- 流年選擇列 ---------- */
+    .year-selector {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin: 0 auto 8px;
+      max-width: 620px;
+    }
+
+    .year-btn {
+      font-family: var(--font-ui);
+      font-size: 13px;
+      letter-spacing: 0.03em;
+      padding: 6px 11px;
+      border-radius: 3px;
+      border: 1px solid #3a3327;
+      background: #1c1812;
+      color: #cbbb96;
+      cursor: pointer;
+      transition: all .18s ease;
+    }
+
+    .year-btn:hover {
+      border-color: var(--purple);
+      color: var(--paper);
+    }
+
+    .year-btn.active {
+      background: var(--purple);
+      border-color: var(--purple);
+      color: #f5eefc;
+      box-shadow: 0 0 0 1px rgba(138, 107, 181, 0.35), 0 4px 14px -4px rgba(138, 107, 181, 0.6);
+    }
+
+    /* 流年說明文字（例如：2025 → 二入中宮） */
+    .year-note {
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--brass-soft);
+      letter-spacing: 0.08em;
+      margin: 0 auto 20px;
+    }
+
+    .year-note .accent-purple {
+      color: var(--purple);
+      font-weight: 700;
+    }
+
+    /* 圖例（三顆星的顏色說明） */
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin: 18px auto 0;
+      font-size: 11.5px;
+      color: #a89a7d;
+      letter-spacing: 0.05em;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .legend-dot.dot-red {
+      background: var(--cinnabar);
+    }
+
+    .legend-dot.dot-black {
+      background: var(--ink);
+    }
+
+    /* 宮位滑鼠移入／點擊選取效果 */
+    .cell {
+      cursor: pointer;
+      transition: background .15s ease, box-shadow .15s ease;
+    }
+
+    .cell:hover,
+    .cell.is-selected {
+      background: #ecdfc0;
+      box-shadow: inset 0 0 0 1.5px var(--brass);
+    }
+
+    .cell.is-center:hover,
+    .cell.is-center.is-selected {
+      background: #ddc9a0;
+    }
+
+    .cell.is-selected {
+      box-shadow: inset 0 0 0 2px var(--cinnabar);
+    }
+
+    /* 點擊提示文字 */
+    .click-hint {
+      text-align: center;
+      max-width: 560px;
+      margin: 22px auto 0;
+      font-size: 12px;
+      color: var(--ink-soft);
+      letter-spacing: 0.04em;
+      line-height: 1.7;
+    }
+
+    /* ---------- 宮位資訊彈出視窗（星曜組合解釋） ---------- */
+    .popup-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 8, 5, 0.68);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 100;
+    }
+
+    .popup-window {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      max-height: 82vh;
+      overflow-y: auto;
+      background: var(--paper);
+      border: 1px solid var(--brass);
+      border-radius: 6px;
+      padding: 24px 24px 18px;
+      box-shadow: 0 24px 70px -14px rgba(0, 0, 0, .75);
+    }
+
+    .popup-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--paper-line);
+      background: transparent;
+      color: var(--ink-soft);
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s ease;
+    }
+
+    .popup-close:hover {
+      background: var(--cinnabar);
+      border-color: var(--cinnabar);
+      color: #fbeee0;
+    }
+
+    .popup-fade-enter-active,
+    .popup-fade-leave-active {
+      transition: opacity .2s ease;
+    }
+
+    .popup-fade-enter-active .popup-window,
+    .popup-fade-leave-active .popup-window {
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .popup-fade-enter-from,
+    .popup-fade-leave-to {
+      opacity: 0;
+    }
+
+    .popup-fade-enter-from .popup-window,
+    .popup-fade-leave-to .popup-window {
+      opacity: 0;
+      transform: scale(.94) translateY(6px);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .popup-fade-enter-active,
+      .popup-fade-leave-active,
+      .popup-fade-enter-active .popup-window,
+      .popup-fade-leave-active .popup-window {
+        transition: none;
+      }
+    }
+
+    .info-panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--paper-line);
+    }
+
+    .info-panel-title {
+      font-family: var(--font-display);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 0.05em;
+    }
+
+    .info-panel-nums {
+      font-size: 12px;
+      color: var(--ink-soft);
+      letter-spacing: 0.03em;
+    }
+
+    .pair-card {
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--paper-line);
+    }
+
+    .pair-card:last-child {
+      border-bottom: none;
+      padding-bottom: 2px;
+    }
+
+    .pair-card-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--brass);
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+
+    .pair-card-title {
+      font-family: var(--font-display);
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--cinnabar);
+      margin-bottom: 4px;
+    }
+
+    .pair-card-rel {
+      font-family: var(--font-ui);
+      font-weight: 400;
+      font-size: 12.5px;
+      color: var(--ink-soft);
+    }
+
+    .pair-card-desc {
+      font-size: 12.5px;
+      line-height: 1.75;
+      color: var(--ink);
+    }
+
+    .pair-card-desc.muted {
+      color: var(--ink-soft);
+      font-style: italic;
+    }
+
+    /* ---------- 五行生剋參考圖（正五邊形排列） ---------- */
+    .wuxing-caption {
+      text-align: center;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--brass);
+      letter-spacing: 0.1em;
+      margin-top: 4px;
+      margin-bottom: 6px;
+    }
+
+    .wuxing-diagram-wrap {
+      width: 240px;
+      max-width: 62%;
+      aspect-ratio: 1 / 1;
+      margin: 0 auto 0px;
+    }
+
+    .wuxing-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    /* 五行文字：墨色襯線體，呼應九宮格與方位文字的字體 */
+    .wx-element {
+      font-family: var(--font-display);
+      font-size: 30px;
+      font-weight: 700;
+      fill: var(--ink);
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+
+    /* 對應數字：兩組配色沿用原圖分組，改為靛藍／朱砂紅 */
+    .wx-num-indigo {
+      font-family: var(--font-ui);
+      font-size: 25px;
+      font-weight: 700;
+      fill: var(--indigo);
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+
+    .wx-num-cinnabar {
+      font-family: var(--font-ui);
+      font-size: 25px;
+      font-weight: 700;
+      fill: var(--cinnabar);
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+
+    /* 外圈相生循環箭頭：黃銅色，呼應「滋養、順生」 */
+    .wx-cycle-arrow {
+      fill: none;
+      stroke: var(--brass);
+      stroke-width: 2.2;
+      stroke-dasharray: 6, 4;
+    }
+
+    /* 內圈相剋五角星箭頭：朱砂紅，呼應「制約、相剋」 */
+    .wx-ke-arrow {
+      fill: none;
+      stroke: var(--cinnabar);
+      stroke-width: 2.2;
+      opacity: .85;
+    }
+
+    .wx-marker-brass {
+      fill: var(--brass);
+    }
+
+    .wx-marker-cinnabar {
+      fill: var(--cinnabar);
+    }
+
+
+
+    /* ---------- 互動式座山單元格（下方紅色座山方位） ---------- */
+    .dir-cell.is-sitting {
+      cursor: pointer;
+      /* 滑鼠懸停顯示手型，提示可點擊 */
+      position: relative;
+      padding: 6px 12px;
+      border-radius: 4px;
+      background: rgba(163, 39, 42, 0.08);
+      /* 淡淡的朱砂紅底色 */
+      border: 1px dashed rgba(163, 39, 42, 0.3);
+      /* 虛線外框 */
+      transition: all .2s ease;
+    }
+
+    /* 滑鼠懸停於座山單元格時的視覺回饋 */
+    .dir-cell.is-sitting:hover {
+      background: rgba(163, 39, 42, 0.15);
+      border-color: var(--cinnabar);
+      box-shadow: 0 0 8px rgba(163, 39, 42, 0.3);
+    }
+
+    /* 結合在座山文字下方的「坐某朝某」字句樣式 */
+    .sitting-text-inline {
+      margin-top: 4px;
+      font-family: var(--font-display);
+      font-size: 16px;
+      /* 坐朝字體大小 */
+      letter-spacing: 0.05em;
+      color: var(--cinnabar);
+      white-space: nowrap;
+      border-top: 1px solid rgba(163, 39, 42, 0.2);
+      padding-top: 3px;
+    }
+
+    /* ---------- 彈出式座山選擇面板 (Popover) ---------- */
+    .popover-selector {
+      position: absolute;
+      bottom: 115%;
+      /* 顯示在座山單元格的上方，避免超出網頁底部 */
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1c1812;
+      /* 深色背景 */
+      border: 1px solid var(--brass);
+      border-radius: 6px;
+      padding: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.85);
+      z-index: 100;
+      /* 確保選單顯示在最上層 */
+      width: 200px;
+      /* 面板寬度 */
+      cursor: default;
+    }
+
+    /* 彈出選單的標題 */
+    .popover-title {
+      font-family: var(--font-display);
+      font-size: 12px;
+      /* 標題字體大小 */
+      color: var(--paper-deep);
+      margin-bottom: 8px;
+      text-align: center;
+      border-bottom: 1px solid #3a3327;
+      padding-bottom: 6px;
+    }
+
+    /* 彈出選單的按鈕網格佈局 */
+    .popover-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      /* 兩欄排版 */
+      gap: 6px;
+    }
+
+    /* 選擇面板中的方位按鈕 */
+    .popover-btn {
+      font-family: var(--font-display);
+      font-size: 13px;
+      /* 按鈕字體大小 */
+      padding: 6px 0;
+      border-radius: 3px;
+      border: 1px solid #3a3327;
+      background: #120f0b;
+      color: #cbbb96;
+      cursor: pointer;
+      transition: all .15s ease;
+      text-align: center;
+    }
+
+    /* 按鈕懸停樣式 */
+    .popover-btn:hover {
+      border-color: var(--brass);
+      color: var(--paper);
+    }
+
+    /* 當前已選擇方位的按鈕啟動樣式 */
+    .popover-btn.active {
+      background: var(--cinnabar);
+      border-color: var(--cinnabar);
+      color: #fbeee0;
+    }
+
+    /* ---------- 頁尾註腳 ---------- */
+    .footnote {
+      text-align: center;
+      margin-top: 34px;
+      font-size: 11.5px;
+      /* 註腳字體大小 */
+      color: #6b6250;
+      letter-spacing: 0.06em;
+    }
+
+    /* ---------- 動畫與漸變設定 (Transition) ---------- */
+    .fade-swap-enter-active,
+    .fade-swap-leave-active {
+      transition: opacity .22s ease, transform .22s ease;
+    }
+
+    .fade-swap-enter-from {
+      opacity: 0;
+      transform: scale(.97);
+    }
+
+    .fade-swap-leave-to {
+      opacity: 0;
+      transform: scale(1.02);
+    }
+
+    .fade-swap-leave-active {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* 針對不希望看到過度動畫的使用者（系統設定減弱動效） */
+    @media (prefers-reduced-motion:reduce) {
+
+      .fade-swap-enter-active,
+      .fade-swap-leave-active {
+        transition: none;
+      }
+    }
+
+    /* 行動裝置或小螢幕的響應式樣式調整 */
+    @media (max-width:420px) {
+      .title {
+        font-size: 26px;
+        /* 小螢幕下調小主標題字體 */
+      }
+
+      .dir-btn {
+        font-size: 14px;
+        padding: 7px 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <script>
+    const { createApp, computed, ref, onMounted, onUnmounted } = Vue;
+
+    /* ---------------------------------------------------------
+       固定資料表 — 依坐山 key 儲存：坐/朝、九宮格資料、外圍八方位
+       本元件不做飛星計算，全部資料皆為預先定義好的固定表
+     --------------------------------------------------------- */
+    const charts = {
+      south: {
+        sitting: "南", facing: "北",
+        grid: [["一", "五", "三"], ["二", "九", "七"], ["六", "四", "八"]],
+        directions: { top: "北", topRight: "東北", right: "東", bottomRight: "東南", bottom: "南", bottomLeft: "西南", left: "西", topLeft: "西北" }
+      },
+      north: {
+        sitting: "北", facing: "南",
+        grid: [["九", "五", "七"], ["八", "一", "三"], ["四", "六", "二"]],
+        directions: { top: "南", topRight: "西南", right: "西", bottomRight: "西北", bottom: "北", bottomLeft: "東北", left: "東", topLeft: "東南" }
+      },
+      east: {
+        sitting: "東", facing: "西",
+        grid: [["九", "五", "四"], ["七", "三", "八"], ["二", "一", "六"]],
+        directions: { top: "西", topRight: "西北", right: "北", bottomRight: "東北", bottom: "東", bottomLeft: "東南", left: "南", topLeft: "西南" }
+      },
+      west: {
+        sitting: "西", facing: "東",
+        grid: [["一", "五", "六"], ["三", "七", "二"], ["八", "九", "四"]],
+        directions: { top: "東", topRight: "東南", right: "南", bottomRight: "西南", bottom: "西", bottomLeft: "西北", left: "北", topLeft: "東北" }
+      },
+      southeast: {
+        sitting: "東南", facing: "西北",
+        grid: [["六", "五", "九"], ["一", "四", "七"], ["八", "三", "二"]],
+        directions: { top: "西北", topRight: "北", right: "東北", bottomRight: "東", bottom: "東南", bottomLeft: "南", left: "西南", topLeft: "西" }
+      },
+      southwest: {
+        sitting: "西南", facing: "東北",
+        grid: [["七", "五", "九"], ["三", "二", "一"], ["四", "八", "六"]],
+        directions: { top: "東北", topRight: "東", right: "東南", bottomRight: "南", bottom: "西南", bottomLeft: "西", left: "西北", topLeft: "北" }
+      },
+      northeast: {
+        sitting: "東北", facing: "西南",
+        grid: [["三", "五", "一"], ["七", "八", "九"], ["六", "二", "四"]],
+        directions: { top: "西南", topRight: "西", right: "西北", bottomRight: "北", bottom: "東北", bottomLeft: "東", left: "東南", topLeft: "南" }
+      },
+      northwest: {
+        sitting: "西北", facing: "東南",
+        grid: [["四", "五", "一"], ["九", "六", "三"], ["二", "七", "八"]],
+        directions: { top: "東南", topRight: "南", right: "西南", bottomRight: "西", bottom: "西北", bottomLeft: "北", left: "東北", topLeft: "東" }
+      }
+    };
+
+    /* 八方位對應之八卦與五行（固定對照表） */
+    const baguaMap = {
+      "北": "坎水",
+      "南": "離火",
+      "東": "震木",
+      "西": "兌金",
+      "東北": "艮土",
+      "東南": "巽木",
+      "西北": "乾金",
+      "西南": "坤土"
+    };
+
+    const selectorButtons = [
+      { label: "北", key: "north" },
+      { label: "南", key: "south" },
+      { label: "東", key: "east" },
+      { label: "西", key: "west" },
+      { label: "東北", key: "northeast" },
+      { label: "東南", key: "southeast" },
+      { label: "西北", key: "northwest" },
+      { label: "西南", key: "southwest" }
+    ];
+
+    /* ---------------------------------------------------------------
+       飛星共用核心演算法（generateFlyingStarChart）
+       ------------------------------------------------------------
+       概念（對照 TypeScript 型別，此檔為單一 HTML／無建置流程，
+       故以 JSDoc 標註型別，邏輯與 TS 版本完全一致，可直接搬移）：
+
+       type Star = 1|2|3|4|5|6|7|8|9;
+       type BaseChart = { grid: string[][] };  // grid 內容為中文數字
+
+       function generateFlyingStarChart(
+         baseChart: BaseChart,
+         centerStar: Star
+       ): Star[][]
+
+       centerStar 可代表：大運入中星、流年入中星、
+       未來的流月／流日／流時入中星——皆呼叫同一函式，
+       演算法完全通用，不寫死任何一運或任何一年。
+    --------------------------------------------------------------- */
+
+    /* 中文數字 <-> 阿拉伯數字對照表 */
+    const cnToNum = { "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9 };
+    const numToCn = { 1: "一", 2: "二", 3: "三", 4: "四", 5: "五", 6: "六", 7: "七", 8: "八", 9: "九" };
+
+    /**
+     * 將任意整數正規化回 1~9 範圍內（處理超過 9 或小於 1 的情況，形成循環）。
+     * @param {number} n
+     * @returns {number} 1~9
+     */
+    function normalizeStar(n) {
+      return ((n - 1) % 9 + 9) % 9 + 1;
+    }
+
+    /**
+     * 建立由 start 開始的九星循環序列（Step 2 / Step 4 共用）。
+     * 例如 buildStarCycle(5) => [5,6,7,8,9,1,2,3,4]
+     * @param {number} start 1~9
+     * @returns {number[]} 長度為 9 的循環序列
+     */
+    function buildStarCycle(start) {
+      const cycle = [];
+      for (let i = 0; i < 9; i++) {
+        cycle.push(normalizeStar(start + i));
+      }
+      return cycle;
+    }
+
+    /**
+     * 飛星共用核心通用函式（大運／流年／未來流月流日流時皆呼叫此函式）。
+     * Step1：取得宅命盤中宮星（baseCenterStar）
+     * Step2：建立以 baseCenterStar 起始的九星循環（baseCycle）
+     * Step3：centerStar 固定入中宮
+     * Step4：建立以 centerStar 起始的九星循環（starCycle），
+     *        並依「baseCycle[i] 在宅命盤上的原始位置」，
+     *        置入「starCycle[i]」，兩序列一一對應。
+     *
+     * @param {string[][]} baseGrid 宅命盤 3x3（內容為中文數字）
+     * @param {number} centerStar 目前入中宮之星（1~9，可為大運星、流年星…）
+     * @returns {number[][]} 對應飛星盤 3x3（內容為阿拉伯數字 1~9）
+     */
+    function generateFlyingStarChart(baseGrid, centerStar) {
+      // Step 1：宅命盤中宮星
+      const baseCenterStar = cnToNum[baseGrid[1][1]];
+
+      // Step 2：以宅命盤中宮星起始的九星循環
+      const baseCycle = buildStarCycle(baseCenterStar);
+
+      // Step 4 使用：以 centerStar 起始的九星循環（Step 3 隱含在此序列的第一項）
+      const starCycle = buildStarCycle(centerStar);
+
+      // 建立「數字 -> 宅命盤座標」的對照表，供 Step4 定位使用
+      const positionOfStar = {};
+      baseGrid.forEach((row, r) => {
+        row.forEach((cn, c) => {
+          positionOfStar[cnToNum[cn]] = [r, c];
+        });
+      });
+
+      // 依序將 starCycle[i] 放入「baseCycle[i] 原本所在」的位置
+      const resultGrid = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+      baseCycle.forEach((baseVal, i) => {
+        const [r, c] = positionOfStar[baseVal];
+        resultGrid[r][c] = starCycle[i];
+      });
+
+      return resultGrid;
+    }
+
+    /**
+     * 大運飛星：直接呼叫共用核心，centerStar = 大運入中星。
+     * @param {string[][]} baseChart 宅命盤
+     * @param {number} periodStar 大運入中星（1~9）
+     * @returns {number[][]}
+     */
+    function generatePeriodChart(baseChart, periodStar) {
+      return generateFlyingStarChart(baseChart, periodStar);
+    }
+
+    /**
+     * 流年飛星：直接呼叫共用核心，centerStar = 流年入中星。
+     * 沿用大運飛星的同一套演算法，不另外設計新邏輯。
+     * @param {string[][]} baseChart 宅命盤
+     * @param {number} annualStar 流年入中星（1~9）
+     * @returns {number[][]}
+     */
+    function generateAnnualChart(baseChart, annualStar) {
+      return generateFlyingStarChart(baseChart, annualStar);
+    }
+
+    /**
+     * 依西元年份取得該年入中星。
+     * 對照：2025→2、2026→1、2027→9、2028→8，之後依九星逆序循環。
+     * 換句話說：以 2025 年（入中星 2）為錨點，年份每 +1，入中星逆序 -1（9 之後回到 1 循環）。
+     * @param {number} year 西元年
+     * @returns {number} 1~9
+     */
+    function yearToAnnualStar(year) {
+      return normalizeStar(2 - (year - 2025));
+    }
+
+    /* 大運選項：一運～九運 */
+    const periodOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+    /* 流年選項：可切換的年份區間 */
+    const currentYear = new Date().getFullYear();
+    const yearOptions = Array.from({ length: 9 }, (_, i) => currentYear - 4 + i);
+
+    /* ---------------------------------------------------------------
+       星曜組合解釋資料表（來自使用者提供的 star-pair-meanings.json）
+       key 格式固定為「較小數字-較大數字」，例如 "1-9"、"4-9"。
+    --------------------------------------------------------------- */
+    const starPairMeanings =
+    {
+      "1-1": {
+        "stars": [
+          1,
+          1
+        ],
+        "title": "一一同宮",
+        "relationship": "水水比和",
+        "description": "一白星重逢，主官貴，貴人助力。利求職升職、人緣旺盛，整體財運、人丁皆平穩向好。同時旺人際桃花，容易結識良緣。但水氣過旺，需謹慎分辨桃花，避免感情雜訊帶來的困擾。"
+      },
+      "2-2": {
+        "stars": [
+          2,
+          2
+        ],
+        "title": "二二同宮",
+        "relationship": "土土比和",
+        "description": "二黑星重疊，陰氣偏重。主體質偏弱、慢性病反覆、婦科問題、手術開刀機率升高。人氣沉悶、運勢停滯，對應人事物平常宜靜不宜動。"
+      },
+      "3-3": {
+        "stars": [
+          3,
+          3
+        ],
+        "title": "三三同宮",
+        "relationship": "木木比和",
+        "description": "三碧星重疊。主是非官費，脾氣急躁、人際對立、口舌不斷，容易捲入爭鬥與矛盾。意外、跌打、肢體損傷機率高，肝氣鬱結、睡眠品質差。"
+      },
+      "4-4": {
+        "stars": [
+          4,
+          4
+        ],
+        "title": "四四同宮",
+        "relationship": "木木比和",
+        "description": "四綠星重疊。讀書考試、文書規劃、才藝發展最為有利。利桃花但感情容易糾結、想太多、內耗重。"
+      },
+      "5-5": {
+        "stars": [
+          5,
+          5
+        ],
+        "title": "五五同宮",
+        "relationship": "土土比和",
+        "description": "五黃星重疊，為大凶大煞，宅內整體運勢低迷，災病容易接連不斷。家宅容易氣場沉鬱，雜事阻礙頻繁。容易反覆抱病、體質虛弱，嚴重時易有手術、意外傷害，整體家運衰退、破財耗損。"
+      },
+      "6-6": {
+        "stars": [
+          6,
+          6
+        ],
+        "title": "六六同宮",
+        "relationship": "金金比和",
+        "description": "六白星重疊，權貴氣場厚重，主家道興旺、財祿穩固，事业與職位發展順利。利管理職務、實業發展，容易掌握權勢、得名得利。金氣過盛，易有意見對立、行事過於剛硬的問題。"
+      },
+      "7-7": {
+        "stars": [
+          7,
+          7
+        ],
+        "title": "七七同宮",
+        "relationship": "金金比和",
+        "description": "七赤星重疊，容易被偷盗，工作成果被窃取。要留意口腔、呼吸方面的身體問題。口舌是非氣較重，個性容易固執強勢，人際爭執較多。但適合律師、談判、辯論等行業或行為。"
+      },
+      "8-8": {
+        "stars": [
+          8,
+          8
+        ],
+        "title": "八八同宮",
+        "relationship": "土土比和",
+        "description": "八白星重疊，為財祿旺象，主田宅興旺、家業穩固，正財收入穩定長久。家宅氣場安穩平和，人丁興旺，適合長久居住經營。整體福氣厚重，容易積累財產與家宅根基，生活順遂，但也進展緩慢。"
+      },
+      "9-9": {
+        "stars": [
+          9,
+          9
+        ],
+        "title": "九九同宮",
+        "relationship": "火火比和",
+        "description": "九紫星重疊，主喜慶貴氣，利名聲曝光、婚嫁喜事、人緣表現亮眼。家宅氣場熱絡，喜事容易臨門，整體運勢活躍順暢。唯火氣偏旺，需留意心氣煩躁，凡事穩重即可少是非，眼部與心血管方面的問題。"
+      },
+      "1-2": {
+        "stars": [
+          1,
+          2
+        ],
+        "title": "一二同宮",
+        "relationship": "土剋水",
+        "description": "二黑土剋一白水，容易引發脾胃不佳、腎虛耳鳴、身體浮腫等問題，常見婦女疾病與代謝異常。是非口舌較多，容易捲入桃花糾紛，因感情招惹諸多麻煩。"
+      },
+      "1-3": {
+        "stars": [
+          1,
+          3
+        ],
+        "title": "一三同宮",
+        "relationship": "木洩水",
+        "description": "一白水生三碧木，多見官非口舌、人事紛爭，意外傷災機率提升。容易引發肝病、神經痠痛、頭部不適，四肢跌打損傷的狀況時有發生。"
+      },
+      "1-4": {
+        "stars": [
+          1,
+          4
+        ],
+        "title": "一四同宮",
+        "relationship": "水生木",
+        "description": "一白水生四綠木，大利讀書考試、文書規劃，利升职能夠提升才華氣質，人緣與桃花皆順暢。桃花過盛易有感情困擾。"
+      },
+      "1-5": {
+        "stars": [
+          1,
+          5
+        ],
+        "title": "一五同宮",
+        "relationship": "土剋水",
+        "description": "五黃土剋一白水，容易招來各類疾病與人事是非，常見貧血、耳疾、婦科問題。身體機能容易虧損，氣機不順暢，生活雜事繁多，感情不穩定，整體阻滯感較重。"
+      },
+      "1-6": {
+        "stars": [
+          1,
+          6
+        ],
+        "title": "一六同宮",
+        "relationship": "金生水",
+        "description": "六白金生一白水，主武貴升遷、財源廣進，利職務晉升與家宅穩固。整體貴人運充足，名利皆有收穫，家宅氣場平和，日常發展平穩順遂。"
+      },
+      "1-7": {
+        "stars": [
+          1,
+          7
+        ],
+        "title": "一七同宮",
+        "relationship": "金生水",
+        "description": "七赤金生一白水，能夠助旺財運、旺家興丁，經商求財頗有助力。但容易伴隨口舌官非、四肢損傷，偶有意外風險，呼吸系統平時需要多加保養調理。"
+      },
+      "1-8": {
+        "stars": [
+          1,
+          8
+        ],
+        "title": "一八同宮",
+        "relationship": "土剋水",
+        "description": "八白土剋一白水，雙吉星組合，主名利雙收、人緣圓潤，桃花良緣充足，財運穩定厚實。水土相剋輕微，僅需留意脾胃與腎氣調養，整體福氣深厚。"
+      },
+      "1-9": {
+        "stars": [
+          1,
+          9
+        ],
+        "title": "一九同宮",
+        "relationship": "水火既濟",
+        "description": "一白水剋九紫火，主家運興旺、人丁興盛，生活多有順遂機遇，家宅氛圍溫和。水火存有牽制，容易出現皮膚、眼部不適，桃花過雜易起感情矛盾。"
+      },
+      "2-3": {
+        "stars": [
+          2,
+          3
+        ],
+        "title": "二三同宮",
+        "relationship": "木剋土",
+        "description": "三碧木剋二黑土，主是非官非、盜賊搶劫，意外傷災時有發生。易出現肝氣鬱結、神經痠痛、四肢受損，頭風頭痛、跌打損傷等問題。"
+      },
+      "2-4": {
+        "stars": [
+          2,
+          4
+        ],
+        "title": "二四同宮",
+        "relationship": "木剋土",
+        "description": "四綠木剋二黑土，生活之中是非爭執較多，感情容易出現糾葛矛盾，同時會引發腸胃不適、關節酸痛，女性也容易有婦科、乳腺方面的隱憂。本身文昌氣充足，利於讀書學習與才藝發展。"
+      },
+      "2-5": {
+        "stars": [
+          2,
+          5
+        ],
+        "title": "二五同宮",
+        "relationship": "土土比和",
+        "description": "二黑土與五黃土比和，土氣過盛會讓身體容易出現慢性疾病，體質偏弱容易疲勞，日常瑣事繁雜，生活壓力會比較大。土氣扎實厚穩，適合腳踏實地累積資源，穩固自身根基。"
+      },
+      "2-6": {
+        "stars": [
+          2,
+          6
+        ],
+        "title": "二六同宮",
+        "relationship": "土生金",
+        "description": "二黑土生六白金，財利積蓄穩定，田宅運勢良好，家宅氛圍和睦平順，生活大多安穩少波動。平日只需多留意脾胃與頭部不適，簡單調理即可。"
+      },
+      "2-7": {
+        "stars": [
+          2,
+          7
+        ],
+        "title": "二七同宮",
+        "relationship": "土生金",
+        "description": "二黑土生七赤金，容易招惹口舌是非與人際矛盾，四肢意外受傷、呼吸不順的狀況時有發生。同時財緣不錯，很適合經商經營，拓展自身人脈資源。"
+      },
+      "2-8": {
+        "stars": [
+          2,
+          8
+        ],
+        "title": "二八同宮",
+        "relationship": "土土比和",
+        "description": "二黑土與八白土比和，容易出現腎氣不足、水腫、脾胃負擔過重等身體問題。財帛收穫穩定，桃花人緣順暢，家宅根基扎實，生活過得安逸踏實。"
+      },
+      "2-9": {
+        "stars": [
+          2,
+          9
+        ],
+        "title": "二九同宮",
+        "relationship": "火生土",
+        "description": "九紫火生二黑土，雜桃花擾動較多，容易影響感情穩定，也要注意心血管與消化方面的身體問題。財源連綿不斷，生活當中時常能遇到喜慶機遇與貴人相助。"
+      },
+      "3-4": {
+        "stars": [
+          3,
+          4
+        ],
+        "title": "三四同宮",
+        "relationship": "木木比和",
+        "description": "三碧木與四綠木比和，容易招惹人事是非與感情困擾，長期下來會引發腸胃、關節方面的不適。本身文氣十足，利讀書考試與文書發展，能夠提升個人才華。"
+      },
+      "3-5": {
+        "stars": [
+          3,
+          5
+        ],
+        "title": "三五同宮",
+        "relationship": "木剋土",
+        "description": "三碧木剋五黃土，煞氣偏重，容易發生各類意外傷害，生活突發狀況多。事業多阻礙，身體容易出現肝氣不順、肢體病痛，日常雜事不斷，運勢較為低迷。"
+      },
+      "3-6": {
+        "stars": [
+          3,
+          6
+        ],
+        "title": "三六同宮",
+        "relationship": "金剋木",
+        "description": "六白金剋三碧木，容易出現跌打損傷、四肢痠痛，平時頭部容易昏沉不適，睡眠品質不佳。金氣端正守序，能讓人處事更有原則，行事穩重，減少無謂是非。"
+      },
+      "3-7": {
+        "stars": [
+          3,
+          7
+        ],
+        "title": "三七同宮",
+        "relationship": "金剋木",
+        "description": "七赤金剋三碧木，容易遇到劫盜、意外血光這類狀況，人際爭執不斷。家庭相處容易有矛盾，筋骨與足部容易留下舊疾，生活之中是非官非容易纏身。"
+      },
+      "3-8": {
+        "stars": [
+          3,
+          8
+        ],
+        "title": "三八同宮",
+        "relationship": "木剋土",
+        "description": "三碧木剋八白土，容易有手足跌傷、鼻部不適等問題，兄弟觀念不合，相處多爭執。家內人情矛盾較多，偶爾會有無端破財的情況，日常瑣事耗神費心。"
+      },
+      "3-9": {
+        "stars": [
+          3,
+          9
+        ],
+        "title": "三九同宮",
+        "relationship": "木生火",
+        "description": "三碧木生九紫火，本身容易性子急躁、做事衝動，情緒起伏較大。身體方面容易出現外傷、燙傷之類的問題，整體人緣不錯，也適合發展人際與交際之事。"
+      },
+      "4-5": {
+        "stars": [
+          4,
+          5
+        ],
+        "title": "四五同宮",
+        "relationship": "木剋土",
+        "description": "四綠木剋五黃土，五黃為大煞之星，晦氣厚重，整體負面氣場偏重。容易引發腸胃疾病、關節痠痛，女性多有乳房與婦科方面的隱憂，生活雜事紛擾不斷。"
+      },
+      "4-6": {
+        "stars": [
+          4,
+          6
+        ],
+        "title": "四六同宮",
+        "relationship": "金剋木",
+        "description": "六白金剋四綠木，文氣旺盛，頭腦思維清晰敏銳。利於考試進修、文書發展，事業當中容易迎來升職機遇，貴人助力充足。會有心神不寧、睡眠品質不佳的狀況發生。"
+      },
+      "4-7": {
+        "stars": [
+          4,
+          7
+        ],
+        "title": "四七同宮",
+        "relationship": "金剋木",
+        "description": "七赤金剋四綠木，容易為感情之事煩憂糾結，感情發展多有波折。日常口舌是非不斷，人際相處易產生摩擦，同時需要留意呼吸系統方面的不適。"
+      },
+      "4-8": {
+        "stars": [
+          4,
+          8
+        ],
+        "title": "四八同宮",
+        "relationship": "木剋土",
+        "description": "四綠木剋八白土，利於求名取祿、累積才學，個人才華與德行容易被看見，財運發展穩固。家人之間容易出現觀念分歧，脾胃功能容易出現負擔。"
+      },
+      "4-9": {
+        "stars": [
+          4,
+          9
+        ],
+        "title": "四九同宮",
+        "relationship": "木生火",
+        "description": "四綠木生九紫火，人氣旺盛，桃花緣濃厚，感情相處氛圍良好。口才與表現能力出眾，容易展露自身才華，提升個人知名度。性格容易急躁衝動，平時較易出現輕微外傷，身邊雜桃花也會較多。"
+      },
+      "5-6": {
+        "stars": [
+          5,
+          6
+        ],
+        "title": "五六同宮",
+        "relationship": "土生金",
+        "description": "五黃土生六白金，主武貴進財，有財祿兩旺之象，需要加強六白金的能量來穩固氣場。生活容易伴隨各類雜事干擾，身體狀態起伏較大，易得貴人扶持，事業發展多有助力。"
+      },
+      "5-7": {
+        "stars": [
+          5,
+          7
+        ],
+        "title": "五七同宮",
+        "relationship": "土生金",
+        "description": "五黃土生七赤金，人際往來當中口舌紛擾較多，是非糾纏不斷。財緣有所增長，日常謀財途徑變多，需要留意呼吸道與皮膚方面的不適。"
+      },
+      "5-8": {
+        "stars": [
+          5,
+          8
+        ],
+        "title": "五八同宮",
+        "relationship": "土土比和",
+        "description": "五黃土與八白土比和，主添人丁、旺家宅，有功名進財之勢，整體福分厚重。土氣過於厚重，容易引發體質虛弱、代謝方面的問題，居家生活容易瑣事繁雜。"
+      },
+      "5-9": {
+        "stars": [
+          5,
+          9
+        ],
+        "title": "五九同宮",
+        "relationship": "土生火",
+        "description": "五黃土生九紫火，身體方面容易出現虛火旺盛的狀況，情緒起伏明顯。身邊時有喜慶機會到來，人緣表現不俗，感情運也會有所走動。"
+      },
+      "6-7": {
+        "stars": [
+          6,
+          7
+        ],
+        "title": "六七同宮",
+        "relationship": "金金比和",
+        "description": "六白金與七赤金比合，自带官貴之氣，利升職掌權，易得權勢機會。金氣過於旺盛會形成交戰之象，容易引發人際爭端與口舌是非，同時易有四肢受損、金氣帶來的外傷問題。"
+      },
+      "6-8": {
+        "stars": [
+          6,
+          8
+        ],
+        "title": "六八同宮",
+        "relationship": "土生金",
+        "description": "八白土生六白金，為財官雙旺的組合，天生貴人助力強，利事業攀升、權位穩固。田宅根基厚實，正財積累順利，家宅整體運勢穩定長遠。土金相生氣場厚重，脾胃與代謝方面容易出現負擔。"
+      },
+      "6-9": {
+        "stars": [
+          6,
+          9
+        ],
+        "title": "六九同宮",
+        "relationship": "火剋金",
+        "description": "九紫火剋六白金，有功名利祿之象，財官兩進，亦主添人丁、旺財庫，科名發展頗有助力。火氣制金容易造成頭部不適、心神煩躁，睡眠品質受到影響，生活之中容易有情緒起伏。"
+      },
+      "7-8": {
+        "stars": [
+          7,
+          8
+        ],
+        "title": "七八同宮",
+        "relationship": "土生金",
+        "description": "八白土生七赤金，七赤氣勢過旺，煞氣被引動。容易是非纏身，口舌不斷，人際紛爭變多，同時伴隨破財耗損，容易有無端損財、人情破耗的狀況。皮膚與呼吸系統容易出現不適，生活雜事紛擾不斷。"
+      },
+      "7-9": {
+        "stars": [
+          7,
+          9
+        ],
+        "title": "七九同宮",
+        "relationship": "火剋金",
+        "description": "九紫火剋七赤金，主散財散人離。容易錢財留不住，人情關係疏遠，親朋之間多有隔閡。情緒容易浮躁不安，常有頭痛煩躁，也易出現外傷、燙傷這類問題。"
+      },
+      "8-9": {
+        "stars": [
+          8,
+          9
+        ],
+        "title": "八九同宮",
+        "relationship": "火生土",
+        "description": "九紫火生八白土，為上等氣場組合，財官兩旺，名利雙收。利功名發展，容易揚名立萬，財源穩定持續，家宅興旺人丁興盛。事事多有助力，整體氣場厚實穩固，進財順遂，各方面發展皆為順利。"
+      }
+    };
+
+    /**
+     * 依兩個星曜數字查表，取得該組合的解釋資料。
+     * 規則：資料表 key 為「數字-數字」，且不保證兩種順序都有收錄，
+     * 所以先查 a-b，查不到再查 b-a（互換查詢）。
+     * @param {number} a
+     * @param {number} b
+     * @returns {object|null}
+     */
+    function lookupStarPair(a, b) {
+      return starPairMeanings[`${a}-${b}`] || starPairMeanings[`${b}-${a}`] || null;
+    }
+
+    /* 九宮格內部座標 (r,c) 對應到外圍方位 key（中宮 (1,1) 無方位） */
+    const cellToDirectionKey = {
+      "0,0": "topLeft", "0,1": "top", "0,2": "topRight",
+      "1,0": "left", "1,2": "right",
+      "2,0": "bottomLeft", "2,1": "bottom", "2,2": "bottomRight"
+    };
+
+    /* ---------------- Compass 裝飾環（純視覺，不含資料）---------------- */
+    const Compass = {
+      props: ["chart"],
+      template: `
+    <svg class="ring-svg" viewBox="0 0 480 480">
+      <circle cx="240" cy="240" r="192" fill="none" stroke="#3a3327" stroke-width="1"/>
+      <circle cx="240" cy="240" r="180" fill="none" stroke="#57492e" stroke-width="1"/>
+      <circle cx="240" cy="240" r="146" fill="none" stroke="#3a3327" stroke-width="1"/>
+      <g stroke="#6b5a35" stroke-width="1">
+        <line v-for="n in 24" :key="n"
+          :x1="240 + 180*Math.cos(n*Math.PI/12)" :y1="240 + 180*Math.sin(n*Math.PI/12)"
+          :x2="240 + 192*Math.cos(n*Math.PI/12)" :y2="240 + 192*Math.sin(n*Math.PI/12)" />
+      </g>
+    </svg>
+  `
+    };
+
+    /* ---------------- 九宮格（僅顯示，不做旋轉計算）----------------
+       grid：宅命盤（固定資料，中文數字）
+       periodGrid：大運盤（由 generatePeriodChart 動態算出，阿拉伯數字）
+       annualGrid：流年盤（由 generateAnnualChart 動態算出，阿拉伯數字）
+    ------------------------------------------------------------- */
+    const NineGrid = {
+      props: ["grid", "periodGrid", "annualGrid", "selectedCell"],
+      emits: ["select-cell"],
+      setup() {
+        const numToCn = { 1: "一", 2: "二", 3: "三", 4: "四", 5: "五", 6: "六", 7: "七", 8: "八", 9: "九" };
+        const getStarColorClass = (val) => {
+          const numMap = { "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9 };
+          const num = typeof val === 'number' ? val : (numMap[val] || parseInt(val, 10));
+          if ([1, 4, 6, 8, 9].includes(num)) {
+            return 'star-red';
+          } else if ([2, 3, 5, 7].includes(num)) {
+            return 'star-black';
+          }
+          return '';
+        };
+        return { numToCn, getStarColorClass };
+      },
+      template: `
+    <div class="nine-grid">
+      <template v-for="(row, r) in grid" :key="'r'+r">
+        <div v-for="(ch, c) in row" :key="'c'+r+c"
+             class="cell"
+             :class="{ 'is-center': r===1 && c===1, 'is-selected': selectedCell && selectedCell.r===r && selectedCell.c===c }"
+             @click="$emit('select-cell', { r, c })">
+          <div class="cell-row-header">
+            <span>宅</span>
+            <span>運</span>
+            <span>流</span>
+          </div>
+          <div class="cell-row-value">
+            <span :class="getStarColorClass(ch)">{{ ch }}</span>
+            <span :class="getStarColorClass(periodGrid[r][c])">{{ numToCn[periodGrid[r][c]] }}</span>
+            <span :class="getStarColorClass(annualGrid[r][c])">{{ annualGrid[r][c] }}</span>
+          </div>
+        </div>
+      </template>
+    </div>
+  `
+    };
+
+    const FlyingStarChart = {
+      components: { Compass, NineGrid },
+      setup() {
+        const activeKey = ref("south");
+        const showSelector = ref(false);
+        const chart = computed(() => charts[activeKey.value]);
+
+        /* 大運（1~9）目前選擇，預設九運 */
+        const periodStar = ref(9);
+        /* 依宅命盤 + 目前大運，動態算出大運盤（不做任何寫死資料） */
+        const periodGrid = computed(() => generatePeriodChart(chart.value.grid, periodStar.value));
+
+        /* 流年（西元年）目前選擇，預設當年度 */
+        const activeYear = ref(currentYear);
+        /* 依年份換算流年入中星 */
+        const annualStar = computed(() => yearToAnnualStar(activeYear.value));
+        /* 沿用同一套核心演算法，依宅命盤 + 流年入中星，動態算出流年盤 */
+        const annualGrid = computed(() => generateAnnualChart(chart.value.grid, annualStar.value));
+
+        /* 目前被點擊選取的宮位座標 { r, c }，關閉彈出視窗時為 null */
+        const selectedCell = ref(null);
+        const onSelectCell = (pos) => {
+          // 點擊同一格：關閉；點擊不同格：切換到該格資料
+          if (selectedCell.value && selectedCell.value.r === pos.r && selectedCell.value.c === pos.c) {
+            selectedCell.value = null;
+          } else {
+            selectedCell.value = pos;
+          }
+        };
+        const closePopup = () => { selectedCell.value = null; };
+
+        /* 依目前選取的宮位，即時組出「宅命×大運」「大運×流年」「宅命×流年」三組查表結果 */
+        const selectedInfo = computed(() => {
+          if (!selectedCell.value) return null;
+          const { r, c } = selectedCell.value;
+          const isCenter = r === 1 && c === 1;
+
+          // 宮位內若為國字數字，一律轉換為阿拉伯數字再查表
+          const baseNum = cnToNum[chart.value.grid[r][c]];
+          const periodNum = periodGrid.value[r][c];
+          const annualNum = annualGrid.value[r][c];
+
+          const dirKey = cellToDirectionKey[`${r},${c}`];
+          const direction = isCenter ? null : chart.value.directions[dirKey];
+
+          const pairs = [
+            { label: "宅命 × 大運", a: baseNum, b: periodNum },
+            { label: "大運 × 流年", a: periodNum, b: annualNum },
+            { label: "宅命 × 流年", a: baseNum, b: annualNum }
+          ].map((p) => ({ ...p, data: lookupStarPair(p.a, p.b) }));
+
+          return { isCenter, direction, baseNum, periodNum, annualNum, pairs };
+        });
+
+        const select = (key) => {
+          activeKey.value = key;
+          showSelector.value = false;
+          selectedCell.value = null;
+        };
+        const selectPeriod = (p) => {
+          periodStar.value = p;
+        };
+        const selectYear = (y) => {
+          activeYear.value = y;
+        };
+        const toggleSelector = (e) => {
+          e.stopPropagation();
+          showSelector.value = !showSelector.value;
+        };
+        const closeSelector = () => {
+          showSelector.value = false;
+        };
+
+        onMounted(() => {
+          window.addEventListener("click", closeSelector);
+        });
+        onUnmounted(() => {
+          window.removeEventListener("click", closeSelector);
+        });
+
+        return {
+          activeKey, showSelector, chart, select, toggleSelector, selectorButtons, baguaMap,
+          periodStar, periodGrid, periodOptions, selectPeriod,
+          activeYear, annualStar, annualGrid, yearOptions, selectYear,
+          selectedCell, selectedInfo, onSelectCell, closePopup,
+          numToCn
+        };
+      },
+      template: `
+    <div class="stage">
+      <div class="header">
+        <div class="eyebrow">紫 白 飛 星</div>
+        <h1 class="title">九宮飛星圖</h1>
+        <div class="subtitle">點擊下方紅色座山方位，即可切換八個不同的座山盤</div>
+      </div>
+
+      <div class="period-selector">
+        <button v-for="p in periodOptions" :key="p"
+                class="period-btn" :class="{ active: periodStar === p }"
+                @click="selectPeriod(p)">
+          {{ numToCn[p] }}運
+        </button>
+      </div>
+      <div class="period-note">
+        目前 <span class="accent">{{ numToCn[periodStar] }}運</span>，<span class="accent">{{ numToCn[periodStar] }}</span> 入中宮
+      </div>
+
+      <div class="year-selector">
+        <button v-for="y in yearOptions" :key="y"
+                class="year-btn" :class="{ active: activeYear === y }"
+                @click="selectYear(y)">
+          {{ y }}
+        </button>
+      </div>
+      <div class="year-note">
+        <span class="accent-purple">{{ activeYear }}</span> 年，<span class="accent-purple">{{ numToCn[annualStar] }}</span> 入中宮（流年星）
+      </div>
+
+      <div class="compass-wrap">
+        <Compass :chart="chart" />
+
+        <transition name="fade-swap" mode="out-in">
+          <div class="compass-grid" :key="activeKey">
+            <div class="dir-cell" :class="{ 'is-facing': chart.directions.topLeft === chart.facing }">
+              <div class="dir-main">{{ chart.directions.topLeft }}</div>
+              <div class="dir-sub">{{ baguaMap[chart.directions.topLeft] }}</div>
+            </div>
+            <div class="dir-cell" :class="{ 'is-facing': chart.directions.top === chart.facing }">
+              <div class="dir-main">{{ chart.directions.top }}</div>
+              <div class="dir-sub">{{ baguaMap[chart.directions.top] }}</div>
+            </div>
+            <div class="dir-cell" :class="{ 'is-facing': chart.directions.topRight === chart.facing }">
+              <div class="dir-main">{{ chart.directions.topRight }}</div>
+              <div class="dir-sub">{{ baguaMap[chart.directions.topRight] }}</div>
+            </div>
+
+            <div class="dir-cell" :class="{ 'is-facing': chart.directions.left === chart.facing }">
+              <div class="dir-main">{{ chart.directions.left }}</div>
+              <div class="dir-sub">{{ baguaMap[chart.directions.left] }}</div>
+            </div>
+            <div class="grid-center">
+              <NineGrid :grid="chart.grid" :period-grid="periodGrid" :annual-grid="annualGrid"
+                        :selected-cell="selectedCell"
+                        @select-cell="onSelectCell" />
+            </div>
+            <div class="dir-cell" :class="{ 'is-facing': chart.directions.right === chart.facing }">
+              <div class="dir-main">{{ chart.directions.right }}</div>
+              <div class="dir-sub">{{ baguaMap[chart.directions.right] }}</div>
+            </div>
+
+            <div class="dir-cell" :class="{ 'is-sitting': chart.directions.bottomLeft === chart.sitting }">
+              <div class="dir-main">{{ chart.directions.bottomLeft }}</div>
+              <div class="dir-sub">{{ baguaMap[chart.directions.bottomLeft] }}</div>
+            </div>
+            <div class="dir-cell" :class="{ 'is-sitting': chart.directions.bottom === chart.sitting }" @click="toggleSelector">
+              <div class="dir-main">{{ chart.directions.bottom }}</div>
+              <div class="dir-sub">{{ baguaMap[chart.directions.bottom] }}</div>
+              <div class="sitting-text-inline">
+                坐{{ chart.sitting }}朝{{ chart.facing }}
+              </div>
+              
+              <!-- 彈出式座山選擇器 -->
+              <transition name="fade-swap">
+                <div v-if="showSelector" class="popover-selector" @click.stop>
+                  <div class="popover-title">選擇座山方位</div>
+                  <div class="popover-grid">
+                    <button v-for="b in selectorButtons" :key="b.key"
+                            class="popover-btn" :class="{ active: activeKey === b.key }"
+                            @click="select(b.key)">
+                      坐{{ b.label }}
+                    </button>
+                  </div>
+                </div>
+              </transition>
+            </div>
+            <div class="dir-cell" :class="{ 'is-sitting': chart.directions.bottomRight === chart.sitting }">
+              <div class="dir-main">{{ chart.directions.bottomRight }}</div>
+              <div class="dir-sub">{{ baguaMap[chart.directions.bottomRight] }}</div>
+            </div>
+          </div>
+        </transition>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item"><span class="legend-dot dot-red"></span>1、4、6、8、9（紅色）</div>
+        <div class="legend-item"><span class="legend-dot dot-black"></span>2、3、5、7（黑色）</div>
+      </div>
+
+      <div class="click-hint">點擊九宮格內任一宮位，查看宅命／大運／流年三種星曜組合解釋（點擊視窗外或按 ✕ 即可關閉）</div>
+
+      <teleport to="body">
+        <transition name="popup-fade">
+          <div v-if="selectedInfo" class="popup-backdrop" @click.self="closePopup">
+            <div class="popup-window">
+              <button class="popup-close" @click="closePopup" aria-label="關閉">✕</button>
+              <div class="info-panel-head">
+                <span class="info-panel-title">{{ selectedInfo.isCenter ? "中宮" : (selectedInfo.direction + "（" + baguaMap[selectedInfo.direction] + "）") }}</span>
+                <span class="info-panel-nums">宅 {{ numToCn[selectedInfo.baseNum] }}・運 {{ numToCn[selectedInfo.periodNum] }}・流 {{ selectedInfo.annualNum }}</span>
+              </div>
+
+              <div class="wuxing-caption">五行生剋</div>
+              <div class="wuxing-diagram-wrap">
+                <svg class="wuxing-svg" viewBox="0 0 500 500">
+                  <defs>
+                    <marker id="wx-arrow-brass" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+                      <path d="M0,0 L6,3 L0,6 z" class="wx-marker-brass" />
+                    </marker>
+                    <marker id="wx-arrow-cinnabar" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+                      <path d="M0,0 L6,3 L0,6 z" class="wx-marker-cinnabar" />
+                    </marker>
+                  </defs>
+
+                  <!-- 外圈相生循環箭頭（木→火→土→金→水→木），以黃銅色呼應「滋養、順生」 -->
+                  <path d="M 275 125 A 135 135 0 0 1 355 190" class="wx-cycle-arrow" marker-end="url(#wx-arrow-brass)" />
+                  <path d="M 378 235 A 135 135 0 0 1 345 335" class="wx-cycle-arrow" marker-end="url(#wx-arrow-brass)" />
+                  <path d="M 310 375 A 135 135 0 0 1 190 375" class="wx-cycle-arrow" marker-end="url(#wx-arrow-brass)" />
+                  <path d="M 155 335 A 135 135 0 0 1 122 235" class="wx-cycle-arrow" marker-end="url(#wx-arrow-brass)" />
+                  <path d="M 145 190 A 135 135 0 0 1 225 125" class="wx-cycle-arrow" marker-end="url(#wx-arrow-brass)" />
+
+                  <!-- 內圈相剋五角星箭頭（木→土→水→火→金→木），以朱砂紅呼應「制約、相剋」 -->
+                  <line x1="258" y1="135" x2="315" y2="335" class="wx-ke-arrow" marker-end="url(#wx-arrow-cinnabar)" />
+                  <line x1="305" y1="350" x2="145" y2="225" class="wx-ke-arrow" marker-end="url(#wx-arrow-cinnabar)" />
+                  <line x1="145" y1="208" x2="355" y2="208" class="wx-ke-arrow" marker-end="url(#wx-arrow-cinnabar)" />
+                  <line x1="355" y1="225" x2="195" y2="350" class="wx-ke-arrow" marker-end="url(#wx-arrow-cinnabar)" />
+                  <line x1="185" y1="335" x2="242" y2="135" class="wx-ke-arrow" marker-end="url(#wx-arrow-cinnabar)" />
+
+                  <!-- 五行文字（正五邊形幾何座標，維持正五邊形排列不變） -->
+                  <text x="250" y="115" class="wx-element">木</text>
+                  <text x="378" y="208" class="wx-element">火</text>
+                  <text x="329" y="359" class="wx-element">土</text>
+                  <text x="171" y="359" class="wx-element">金</text>
+                  <text x="122" y="208" class="wx-element">水</text>
+
+                  <!-- 對應數字（indigo／cinnabar 兩色，沿用原圖分組） -->
+                  <text x="220" y="65" class="wx-num-indigo">3</text>
+                  <text x="245" y="65" class="wx-num-cinnabar">4</text>
+
+                  <text x="425" y="208" class="wx-num-cinnabar">9</text>
+
+                  <text x="322" y="415" class="wx-num-indigo">2</text>
+                  <text x="346" y="415" class="wx-num-indigo">5</text>
+                  <text x="372" y="415" class="wx-num-cinnabar">8</text>
+
+                  <text x="125" y="415" class="wx-num-cinnabar">6</text>
+                  <text x="145" y="415" class="wx-num-indigo">7</text>
+
+                  <text x="75" y="208" class="wx-num-cinnabar">1</text>
+                </svg>
+              </div>
+
+              <div class="pair-card" v-for="p in selectedInfo.pairs" :key="p.label">
+                <div class="pair-card-label">{{ p.label }}（{{ p.a }}-{{ p.b }}）</div>
+                <template v-if="p.data">
+                  <div class="pair-card-title">{{ p.data.title }}<span class="pair-card-rel">・{{ p.data.relationship }}</span></div>
+                  <div class="pair-card-desc">{{ p.data.description }}</div>
+                </template>
+                <template v-else>
+                  <div class="pair-card-desc muted">此組合尚無對應資料</div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </transition>
+      </teleport>
+
+      <div class="footnote">畫面下方固定為坐山方位・紅線與九宮格底邊融合・點擊座山即可切換方位・大運盤與流年盤皆由同一套 generateFlyingStarChart() 動態演算，未寫死任何一運或任何一年</div>
+    </div>
+  `
+    };
+
+    createApp(FlyingStarChart).mount("#app");
+  </script>
+</body>
+
+</html>
