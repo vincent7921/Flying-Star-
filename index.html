@@ -128,13 +128,7 @@
       margin: 0 auto;
     }
 
-    /* 後方 SVG 裝飾環的絕對定位 */
-    .ring-svg {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-    }
+
 
     /* 羅盤的網格版面：包含外圍八方位文字與中間的九宮格 */
     .compass-grid {
@@ -288,10 +282,10 @@
       color: var(--ink) !important;
     }
 
-    /* 中宮特別強調：底色略深，提示此格為運星入中之處 */
+    /* 中宮特別強調：底色略深，提示此格為運星入中之處 
     .cell.is-center {
       background: var(--paper-deep);
-    }
+    }*/
 
     /* ---------- 大運選擇列 ---------- */
     .period-selector {
@@ -898,14 +892,14 @@
 
     /* 八方位對應之八卦與五行（固定對照表） */
     const baguaMap = {
-      "北": "坎水",
-      "南": "離火",
-      "東": "震木",
-      "西": "兌金",
-      "東北": "艮土",
-      "東南": "巽木",
-      "西北": "乾金",
-      "西南": "坤土"
+      "北": "坎水-喜砂-中男財庫",
+      "南": "離火-喜水-中女人際",
+      "東": "震木-喜砂-長男事業",
+      "西": "兌金-喜水-少女口舌",
+      "東北": "艮土-喜水-少男學業",
+      "東南": "巽木-喜砂-長女感情",
+      "西北": "乾金-喜水-老父權勢",
+      "西南": "坤土-喜砂-老母家運"
     };
 
     const selectorButtons = [
@@ -1477,22 +1471,7 @@
       "2,0": "bottomLeft", "2,1": "bottom", "2,2": "bottomRight"
     };
 
-    /* ---------------- Compass 裝飾環（純視覺，不含資料）---------------- */
-    const Compass = {
-      props: ["chart"],
-      template: `
-    <svg class="ring-svg" viewBox="0 0 480 480">
-      <circle cx="240" cy="240" r="192" fill="none" stroke="#3a3327" stroke-width="1"/>
-      <circle cx="240" cy="240" r="180" fill="none" stroke="#57492e" stroke-width="1"/>
-      <circle cx="240" cy="240" r="146" fill="none" stroke="#3a3327" stroke-width="1"/>
-      <g stroke="#6b5a35" stroke-width="1">
-        <line v-for="n in 24" :key="n"
-          :x1="240 + 180*Math.cos(n*Math.PI/12)" :y1="240 + 180*Math.sin(n*Math.PI/12)"
-          :x2="240 + 192*Math.cos(n*Math.PI/12)" :y2="240 + 192*Math.sin(n*Math.PI/12)" />
-      </g>
-    </svg>
-  `
-    };
+
 
     /* ---------------- 九宮格（僅顯示，不做旋轉計算）----------------
        grid：宅命盤（固定資料，中文數字）
@@ -1540,7 +1519,7 @@
     };
 
     const FlyingStarChart = {
-      components: { Compass, NineGrid },
+      components: { NineGrid },
       setup() {
         const activeKey = ref("south");
         const showSelector = ref(false);
@@ -1632,7 +1611,7 @@
       <div class="header">
         <div class="eyebrow">紫 白 飛 星</div>
         <h1 class="title">九宮飛星圖</h1>
-        <div class="subtitle">點擊下方紅色座山方位，即可切換八個不同的座山盤</div>
+        
       </div>
 
       <div class="period-selector">
@@ -1658,8 +1637,6 @@
       </div>
 
       <div class="compass-wrap">
-        <Compass :chart="chart" />
-
         <transition name="fade-swap" mode="out-in">
           <div class="compass-grid" :key="activeKey">
             <div class="dir-cell" :class="{ 'is-facing': chart.directions.topLeft === chart.facing }">
@@ -1722,12 +1699,7 @@
         </transition>
       </div>
 
-      <div class="legend">
-        <div class="legend-item"><span class="legend-dot dot-red"></span>1、4、6、8、9（紅色）</div>
-        <div class="legend-item"><span class="legend-dot dot-black"></span>2、3、5、7（黑色）</div>
-      </div>
-
-      <div class="click-hint">點擊九宮格內任一宮位，查看宅命／大運／流年三種星曜組合解釋（點擊視窗外或按 ✕ 即可關閉）</div>
+  
 
       <teleport to="body">
         <transition name="popup-fade">
@@ -1803,8 +1775,7 @@
           </div>
         </transition>
       </teleport>
-
-      <div class="footnote">畫面下方固定為坐山方位・紅線與九宮格底邊融合・點擊座山即可切換方位・大運盤與流年盤皆由同一套 generateFlyingStarChart() 動態演算，未寫死任何一運或任何一年</div>
+      <div class="footnote">點擊下方紅色座山方位，即可切換八個不同的座山盤</div>
     </div>
   `
     };
