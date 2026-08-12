@@ -366,11 +366,11 @@
     }
 
     /* ---------- 座山選擇（獨立於九宮格之外的按鈕＋彈出選單） ---------- */
+    /* 按鈕本身置於九宮格下方，方便手機單手操作（拇指容易觸及畫面下半部） */
     .sitting-control {
-      position: relative;
       display: flex;
       justify-content: center;
-      margin: 0 auto 16px;
+      margin: 18px auto 0;
     }
 
     .sitting-btn {
@@ -405,20 +405,54 @@
       transform: rotate(180deg);
     }
 
-    /* 彈出式座山選擇面板：向下展開（觸發鈕在版面上方，下方空間充足） */
-    .sitting-popover {
-      position: absolute;
-      top: 115%;
-      left: 50%;
-      transform: translateX(-50%);
+    /* 座山選擇面板改為「置中彈出視窗」（與宮位資訊彈窗同一套互動模式），
+       不論按鈕在畫面何處，選單一律浮在畫面正中央，不用捲動畫面就能點選，
+       行動裝置上拇指也能一次完成「開啟→選擇」。 */
+    .sitting-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 8, 5, 0.68);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 100;
+    }
+
+    .sitting-modal-window {
+      position: relative;
+      width: 100%;
+      max-width: 260px;
       background: #1c1812;
       border: 1px solid var(--brass);
-      border-radius: 6px;
-      padding: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.85);
-      z-index: 100;
-      width: 200px;
-      cursor: default;
+      border-radius: 8px;
+      padding: 20px 16px 16px;
+      box-shadow: 0 24px 70px -14px rgba(0, 0, 0, .75);
+    }
+
+    .sitting-modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1px solid #3a3327;
+      background: transparent;
+      color: var(--brass-soft);
+      font-size: 13px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s ease;
+    }
+
+    .sitting-modal-close:hover {
+      border-color: var(--brass);
+      color: var(--paper);
     }
 
     /* 圖例（三顆星的顏色說明） */
@@ -1625,7 +1659,7 @@
         });
 
         return {
-          activeKey, showSelector, chart, select, toggleSelector, selectorButtons, baguaMap,
+          activeKey, showSelector, chart, select, toggleSelector, closeSelector, selectorButtons, baguaMap,
           periodStar, periodGrid, periodOptions, selectPeriod,
           activeYear, annualStar, annualGrid, yearOptions, selectYear,
           selectedCell, selectedInfo, onSelectCell, closePopup,
@@ -1660,8 +1694,6 @@
         <span class="accent-purple">{{ activeYear }}年・{{ numToCn[annualStar] }}入中（流年星）</span>
       </div>
 
-
-
       <div class="grid-wrap">
         <transition name="fade-swap" mode="out-in">
           <NineGrid :key="activeKey"
@@ -1671,29 +1703,33 @@
                     @select-cell="onSelectCell" />
         </transition>
       </div>
-      
-            <div class="sitting-control">
+
+      <div class="sitting-control">
         <button class="sitting-btn" :aria-expanded="showSelector" @click="toggleSelector">
           坐{{ chart.sitting }}朝{{ chart.facing }}
           <span class="chevron">▾</span>
         </button>
+      </div>
 
-        <!-- 彈出式座山選擇器：獨立於九宮格之外，向下展開 -->
-        <transition name="fade-swap">
-          <div v-if="showSelector" class="sitting-popover" @click.stop>
-            <div class="popover-title">選擇座山方位</div>
-            <div class="popover-grid">
-              <button v-for="b in selectorButtons" :key="b.key"
-                      class="popover-btn" :class="{ active: activeKey === b.key }"
-                      @click="select(b.key)">
-                坐{{ b.label }}
-              </button>
+      <!-- 座山選擇彈窗：置中顯示於畫面正中央（與宮位資訊彈窗同一套模式），
+           不論按鈕實際位置在哪，都不需捲動畫面即可完成選擇，行動裝置上更好操作 -->
+      <teleport to="body">
+        <transition name="popup-fade">
+          <div v-if="showSelector" class="sitting-modal-backdrop" @click.self="closeSelector">
+            <div class="sitting-modal-window" @click.stop>
+              <button class="sitting-modal-close" @click="closeSelector" aria-label="關閉">✕</button>
+              <div class="popover-title">選擇座山方位</div>
+              <div class="popover-grid">
+                <button v-for="b in selectorButtons" :key="b.key"
+                        class="popover-btn" :class="{ active: activeKey === b.key }"
+                        @click="select(b.key)">
+                  坐{{ b.label }}
+                </button>
+              </div>
             </div>
           </div>
         </transition>
-      </div>
-
-  
+      </teleport>
 
       <teleport to="body">
         <transition name="popup-fade">
