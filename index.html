@@ -161,18 +161,85 @@
       pointer-events: none;
     }
 
-    /* 九宮格單個宮位單元格：同時顯示「流年星」、「大運星」與「宅命星」 */
+    /* ---------- 四柱八字卡片區 ---------- */
+    .sizhu-panel {
+      width: 100%;
+      background: #1c1812;
+      border: 1px solid var(--brass);
+      border-radius: 6px;
+      padding: 16px;
+      margin: 0 auto 20px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      max-width: 520px;
+    }
+
+    .sizhu-title {
+      font-family: var(--font-display);
+      font-size: 14px;
+      color: var(--brass-soft);
+      letter-spacing: 0.15em;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .sizhu-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .sizhu-card {
+      text-align: center;
+      border: 1px solid #3a3327;
+      border-radius: 5px;
+      padding: 8px 4px;
+      background: #120f0b;
+    }
+
+    .sizhu-card .role {
+      font-size: 11px;
+      color: #a89a7d;
+      letter-spacing: 0.15em;
+    }
+
+    .sizhu-card .gz {
+      font-family: var(--font-display);
+      font-size: 20px;
+      margin-top: 4px;
+      letter-spacing: 0.1em;
+      color: var(--paper);
+      font-weight: 700;
+    }
+
+    .sizhu-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 16px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: #a89a7d;
+      justify-content: center;
+      border-top: 1px dashed #3a3327;
+      padding-top: 10px;
+    }
+
+    .sizhu-meta b {
+      color: var(--brass-soft);
+    }
+
+    /* 九宮格單個宮位單元格：同時顯示「宅命星、大運星、流年星」與「流月星、流日星、流時星」 */
     .cell {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 2px;
+      gap: 0px;
       border: 0.5px solid var(--paper-line);
       /* 宮位間的分隔細線 */
       background: var(--paper);
       position: relative;
       aspect-ratio: 1/1;
+      padding: 2px 1px;
     }
 
     .cell-row-header,
@@ -180,20 +247,33 @@
       display: flex;
       justify-content: space-around;
       width: 100%;
-      padding: 0 2px;
+      padding: 0 1px;
     }
 
     .cell-row-header {
       font-family: var(--font-ui);
-      font-size: clamp(9px, 1.6vw, 11px);
+      font-size: clamp(7.5px, 1.3vw, 9.5px);
       color: var(--ink-soft);
-      letter-spacing: 0.02em;
+      letter-spacing: 0.01em;
+      opacity: 0.85;
     }
 
     .cell-row-value {
       font-family: var(--font-display);
-      font-size: clamp(16px, 3.8vw, 24px);
+      font-size: clamp(12px, 2.6vw, 17px);
       font-weight: 700;
+      line-height: 1.05;
+    }
+
+    /* 宅運流與月日時之間的精緻分隔線 */
+    .cell-row-divider {
+      width: 86%;
+      height: 1px;
+      margin: 3px 0;
+      border-top: 1px dashed var(--paper-line);
+      opacity: 0.7;
+      margin-top: 8px;
+      margin-bottom: 8px;
     }
 
     .cell-row-header span,
@@ -210,10 +290,46 @@
       color: var(--ink) !important;
     }
 
-    /* 中宮特別強調：底色略深，提示此格為運星入中之處 
-    .cell.is-center {
-      background: var(--paper-deep);
-    }*/
+    .date-input {
+      font-family: var(--font-display);
+      font-size: 13px;
+      padding: 5px 8px;
+      border-radius: 4px;
+      border: 1px solid #4a4130;
+      background-color: #120f0b;
+      color: var(--paper);
+      color-scheme: dark;
+      cursor: pointer;
+      min-height: 31px;
+    }
+
+    .date-input::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      filter: invert(0.8);
+    }
+
+    .date-input:focus {
+      outline: none;
+      border-color: var(--brass);
+    }
+
+    .now-btn {
+      padding: 5px 12px;
+      border: 1px solid var(--cinnabar);
+      color: var(--cinnabar);
+      background: transparent;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: var(--font-ui);
+      font-size: 12.5px;
+      letter-spacing: 0.05em;
+      transition: all .15s;
+    }
+
+    .now-btn:hover {
+      background: var(--cinnabar);
+      color: #fff8ec;
+    }
 
     /* 內嵌於九宮格四角／四邊格的方位小標籤：取代原先九宮格外圍的八方位環，
        讓九宮格能佔滿版面寬度，同時仍可辨識每一宮所對應的方位與其卦名／五行／人物意涵。
@@ -225,8 +341,8 @@
       align-items: stretch;
       width: 100%;
       padding: 0 3px;
-      line-height: 1.3;
-      margin-bottom: 3px;
+      line-height: 1.5;
+      margin-bottom: 10px;
       text-align: center;
       pointer-events: none;
     }
@@ -951,6 +1067,165 @@
       { label: "西南", key: "southwest" }
     ];
 
+    /* -----------------------------------------------------------
+       一、曆法核心：節氣（近似天文公式）／干支／四柱八字
+       ----------------------------------------------------------- */
+    const STERM_OFFSET = [0, 21208, 42467, 63836, 85337, 107014, 128867, 150921, 173149, 195551,
+      218072, 240693, 263343, 285989, 308563, 331033, 353350, 375494, 397447, 419210,
+      440795, 462224, 483532, 504758];
+    function solarTermTaipeiMs(year, n) {
+      const base = Date.UTC(1900, 0, 6, 2, 5, 0);
+      const t = 31556925974.7 * (year - 1900) + STERM_OFFSET[n] * 60000 + base;
+      return t + 8 * 3600 * 1000;
+    }
+    function dtToMs(y, m, d, h, mi) { return Date.UTC(y, m - 1, d, h || 0, mi || 0); }
+    function getLiChun(year) { return solarTermTaipeiMs(year, 2); }
+    function getDongZhi(year) { return solarTermTaipeiMs(year, 23); }
+    function getXiaZhi(year) { return solarTermTaipeiMs(year, 11); }
+    function getYuShui(year) { return solarTermTaipeiMs(year, 3); }    // 雨水
+    function getGuYu(year) { return solarTermTaipeiMs(year, 7); }      // 穀雨
+    function getChuShu(year) { return solarTermTaipeiMs(year, 15); }   // 處暑
+    function getShuangJiang(year) { return solarTermTaipeiMs(year, 19); } // 霜降
+
+    const GAN = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+    const ZHI = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+    const ZHI_FIVE_TIGER_START = { 0: 2, 5: 2, 1: 4, 6: 4, 2: 6, 7: 6, 3: 8, 8: 8, 4: 0, 9: 0 };
+    const WU_SHU_DUN_START = { 0: 0, 5: 0, 1: 2, 6: 2, 2: 4, 7: 4, 3: 6, 8: 6, 4: 8, 9: 8 };
+
+    const EPOCH_MS = Date.UTC(2024, 0, 1, 0, 0, 0); // 2024-01-01 = 甲子日
+    function dayGanZhiIndex(y, m, d) {
+      const ms = Date.UTC(y, m - 1, d, 0, 0, 0);
+      const days = Math.round((ms - EPOCH_MS) / 86400000);
+      return ((days % 60) + 60) % 60;
+    }
+    function hourToZhiIndex(hour) { const h = ((hour + 1) % 24); return Math.floor(h / 2) % 12; }
+    function ganIdx(i) { return ((i % 10) + 10) % 10; }
+    function zhiIdx(i) { return ((i % 12) + 12) % 12; }
+
+    function getSiZhu(y, m, d, h, mi) {
+      const ms = dtToMs(y, m, d, h, mi);
+      let astroYear = y;
+      if (ms < getLiChun(y)) astroYear = y - 1;
+      const yG = ganIdx(astroYear - 4), yZ = zhiIdx(astroYear - 4);
+
+      const jieSeq = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 0];
+      const monthZhiSeq = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1];
+      let boundaries = [];
+      for (let k = 0; k < 12; k++) {
+        const termN = jieSeq[k];
+        const yy = (termN === 0) ? astroYear + 1 : astroYear;
+        boundaries.push({ ms: solarTermTaipeiMs(yy, termN), monthZhi: monthZhiSeq[k] });
+      }
+      let monthZhi = 1;
+      for (let k = 0; k < boundaries.length; k++) { if (ms >= boundaries[k].ms) monthZhi = boundaries[k].monthZhi; }
+      const mG0 = ZHI_FIVE_TIGER_START[yG];
+      const monthOffset = zhiIdx(monthZhi - 2);
+      const mG = ganIdx(mG0 + monthOffset), mZ = monthZhi;
+
+      const dIdx = dayGanZhiIndex(y, m, d);
+      const dG = ganIdx(dIdx), dZ = zhiIdx(dIdx);
+
+      const hZ = hourToZhiIndex(h);
+      const hG0 = WU_SHU_DUN_START[dG];
+      const hG = ganIdx(hG0 + hZ);
+
+      return {
+        year: { g: yG, z: yZ, label: GAN[yG] + ZHI[yZ] },
+        month: { g: mG, z: mZ, label: GAN[mG] + ZHI[mZ] },
+        day: { g: dG, z: dZ, label: GAN[dG] + ZHI[dZ] },
+        hour: { g: hG, z: hZ, label: GAN[hG] + ZHI[hZ] },
+        astroYear, monthZhi
+      };
+    }
+
+    /* -----------------------------------------------------------
+       二、紫白飛星：年／月／日／時 入中宮星 推算
+       ----------------------------------------------------------- */
+    function getYearStarInfo(astroYear) {
+      const cyclePos = (((astroYear - 1864) % 180) + 180) % 180;
+      const blockIndex = Math.floor(cyclePos / 60);
+      const baseStar = [1, 4, 7][blockIndex];
+      const offsetInBlock = cyclePos - blockIndex * 60;
+      const star = ((baseStar - 1 - offsetInBlock) % 9 + 9) % 9 + 1;
+      const YUAN_NAMES = ["上元", "中元", "下元"];
+      const YUN_NAMES = ["一運", "二運", "三運", "四運", "五運", "六運", "七運", "八運", "九運"];
+      const yun = blockIndex * 3 + Math.floor(offsetInBlock / 20);
+      return { star, yuan: YUAN_NAMES[blockIndex], yun: YUN_NAMES[yun] };
+    }
+    function getMonthStar(yearZhiIdx, monthZhi) {
+      let base;
+      if ([0, 6, 3, 9].includes(yearZhiIdx)) base = 8;
+      else if ([4, 10, 1, 7].includes(yearZhiIdx)) base = 5;
+      else base = 2;
+      const monthOffset = zhiIdx(monthZhi - 2);
+      return ((base - 1 - monthOffset) % 9 + 9) % 9 + 1;
+    }
+    function getDunAnchor(y, m, d, h, mi) {
+      const ms = dtToMs(y, m, d, h, mi);
+      const events = [];
+      for (let yy = y - 1; yy <= y + 1; yy++) {
+        events.push({ ms: getDongZhi(yy), type: '冬至', yy });
+        events.push({ ms: getXiaZhi(yy), type: '夏至', yy });
+      }
+      events.sort((a, b) => a.ms - b.ms);
+      let last = events[0];
+      for (const e of events) { if (e.ms <= ms) last = e; else break; }
+      return last;
+    }
+    function nineRemainder(n) {
+      const r = ((n % 9) + 9) % 9;
+      return r === 0 ? 9 : r;
+    }
+    function getDayStarInfo(y, m, d, h, mi) {
+      const anchor = getDunAnchor(y, m, d, h, mi);
+      const dun = anchor.type === '冬至' ? 'yang' : 'yin';
+      const ms = dtToMs(y, m, d, h, mi);
+      const zhuShu = (dayGanZhiIndex(y, m, d) % 60) + 1;
+      let star;
+      if (dun === 'yang') {
+        const nextYear = anchor.yy + 1;
+        const yushui = getYuShui(nextYear);
+        const guyu = getGuYu(nextYear);
+        if (ms < yushui) star = nineRemainder(zhuShu);
+        else if (ms < guyu) star = nineRemainder(zhuShu + 6);
+        else star = nineRemainder(zhuShu + 3);
+      } else {
+        const chushu = getChuShu(anchor.yy);
+        const shuangjiang = getShuangJiang(anchor.yy);
+        if (ms < chushu) star = nineRemainder(64 - zhuShu);
+        else if (ms < shuangjiang) star = nineRemainder(67 - zhuShu);
+        else star = nineRemainder(61 - zhuShu);
+      }
+      return { star, dun };
+    }
+    function getHourStar(dun, dayZhiIdx, hourZhiIdx) {
+      const groupA = [0, 6, 3, 9], groupB = [4, 10, 1, 7], groupC = [2, 8, 5, 11];
+      const g = groupA.includes(dayZhiIdx) ? 'A' : (groupB.includes(dayZhiIdx) ? 'B' : 'C');
+      if (dun === 'yang') {
+        const base = { A: 1, B: 4, C: 7 }[g];
+        return ((base - 1 + hourZhiIdx) % 9) + 1;
+      } else {
+        const base = { A: 9, B: 6, C: 3 }[g];
+        return ((base - 1 - hourZhiIdx) % 9 + 9) % 9 + 1;
+      }
+    }
+
+    const SHICHEN = [
+      { name: "子時", range: "23:00–00:59", hour: 23 },
+      { name: "丑時", range: "01:00–02:59", hour: 1 },
+      { name: "寅時", range: "03:00–04:59", hour: 3 },
+      { name: "卯時", range: "05:00–06:59", hour: 5 },
+      { name: "辰時", range: "07:00–08:59", hour: 7 },
+      { name: "巳時", range: "09:00–10:59", hour: 9 },
+      { name: "午時", range: "11:00–12:59", hour: 11 },
+      { name: "未時", range: "13:00–14:59", hour: 13 },
+      { name: "申時", range: "15:00–16:59", hour: 15 },
+      { name: "酉時", range: "17:00–18:59", hour: 17 },
+      { name: "戌時", range: "19:00–20:59", hour: 19 },
+      { name: "亥時", range: "21:00–22:59", hour: 21 },
+    ];
+    function padZero(n) { return String(n).padStart(2, '0'); }
+
     /* ---------------------------------------------------------------
        飛星共用核心演算法（generateFlyingStarChart）
        ------------------------------------------------------------
@@ -1513,11 +1788,14 @@
 
     /* ---------------- 九宮格（僅顯示，不做旋轉計算）----------------
        grid：宅命盤（固定資料，中文數字）
-       periodGrid：大運盤（由 generatePeriodChart 動態算出，阿拉伯數字）
-       annualGrid：流年盤（由 generateAnnualChart 動態算出，阿拉伯數字）
+       periodGrid：大運盤
+       annualGrid：流年盤
+       monthGrid：流月盤
+       dayGrid：流日盤
+       hourGrid：流時盤
     ------------------------------------------------------------- */
     const NineGrid = {
-      props: ["grid", "periodGrid", "annualGrid", "selectedCell", "directions", "sitting", "facing"],
+      props: ["grid", "periodGrid", "annualGrid", "monthGrid", "dayGrid", "hourGrid", "selectedCell", "directions", "sitting", "facing"],
       emits: ["select-cell"],
       setup(props) {
         const numToCn = { 1: "一", 2: "二", 3: "三", 4: "四", 5: "五", 6: "六", 7: "七", 8: "八", 9: "九" };
@@ -1572,6 +1850,17 @@
             <span :class="getStarColorClass(periodGrid[r][c])">{{ numToCn[periodGrid[r][c]] }}</span>
             <span :class="getStarColorClass(annualGrid[r][c])">{{ annualGrid[r][c] }}</span>
           </div>
+          <div class="cell-row-divider"></div>
+          <div class="cell-row-header">
+            <span>月</span>
+            <span>日</span>
+            <span>時</span>
+          </div>
+          <div class="cell-row-value">
+            <span :class="getStarColorClass(monthGrid[r][c])">{{ monthGrid[r][c] }}</span>
+            <span :class="getStarColorClass(dayGrid[r][c])">{{ dayGrid[r][c] }}</span>
+            <span :class="getStarColorClass(hourGrid[r][c])">{{ hourGrid[r][c] }}</span>
+          </div>
         </div>
       </template>
     </div>
@@ -1587,15 +1876,57 @@
 
         /* 大運（1~9）目前選擇，預設九運 */
         const periodStar = ref(9);
-        /* 依宅命盤 + 目前大運，動態算出大運盤（不做任何寫死資料） */
+        /* 依宅命盤 + 目前大運，動態算出大運盤 */
         const periodGrid = computed(() => generatePeriodChart(chart.value.grid, periodStar.value));
 
         /* 流年（西元年）目前選擇，預設當年度 */
         const activeYear = ref(currentYear);
         /* 依年份換算流年入中星 */
         const annualStar = computed(() => yearToAnnualStar(activeYear.value));
-        /* 沿用同一套核心演算法，依宅命盤 + 流年入中星，動態算出流年盤 */
+        /* 依宅命盤 + 流年入中星，動態算出流年盤 */
         const annualGrid = computed(() => generateAnnualChart(chart.value.grid, annualStar.value));
+
+        /* 時間與四柱八字設定 */
+        const now = new Date();
+        const dateStr = ref(`${now.getFullYear()}-${padZero(now.getMonth() + 1)}-${padZero(now.getDate())}`);
+        const shichenIndex = ref(Math.floor((((now.getHours() + 1) % 24)) / 2));
+
+        const parsedDate = computed(() => {
+          if (!dateStr.value) return { y: currentYear, m: 1, d: 1 };
+          const [y, m, d] = dateStr.value.split('-').map(Number);
+          return { y, m, d };
+        });
+
+        const hour = computed(() => SHICHEN[shichenIndex.value].hour);
+
+        const siZhu = computed(() => {
+          const { y, m, d } = parsedDate.value;
+          if (!y || !m || !d) return null;
+          return getSiZhu(y, m, d, hour.value, 0);
+        });
+
+        const yearStarInfo = computed(() => siZhu.value ? getYearStarInfo(siZhu.value.astroYear) : null);
+        const monthStar = computed(() => siZhu.value ? getMonthStar(siZhu.value.year.z, siZhu.value.month.z) : null);
+        const dayStarInfo = computed(() => {
+          const { y, m, d } = parsedDate.value;
+          if (!y || !m || !d) return null;
+          return getDayStarInfo(y, m, d, hour.value, 0);
+        });
+        const hourStar = computed(() => {
+          if (!siZhu.value || !dayStarInfo.value) return null;
+          return getHourStar(dayStarInfo.value.dun, siZhu.value.day.z, siZhu.value.hour.z);
+        });
+
+        /* 動態計算流月、流日、流時飛星盤（隨座山旋轉） */
+        const monthGrid = computed(() => monthStar.value ? generateFlyingStarChart(chart.value.grid, monthStar.value) : [[0, 0, 0], [0, 0, 0], [0, 0, 0]]);
+        const dayGrid = computed(() => dayStarInfo.value ? generateFlyingStarChart(chart.value.grid, dayStarInfo.value.star) : [[0, 0, 0], [0, 0, 0], [0, 0, 0]]);
+        const hourGrid = computed(() => hourStar.value ? generateFlyingStarChart(chart.value.grid, hourStar.value) : [[0, 0, 0], [0, 0, 0], [0, 0, 0]]);
+
+        const setNow = () => {
+          const curr = new Date();
+          dateStr.value = `${curr.getFullYear()}-${padZero(curr.getMonth() + 1)}-${padZero(curr.getDate())}`;
+          shichenIndex.value = Math.floor((((curr.getHours() + 1) % 24)) / 2);
+        };
 
         /* 目前被點擊選取的宮位座標 { r, c }，關閉彈出視窗時為 null */
         const selectedCell = ref(null);
@@ -1609,16 +1940,18 @@
         };
         const closePopup = () => { selectedCell.value = null; };
 
-        /* 依目前選取的宮位，即時組出「宅命×大運」「大運×流年」「宅命×流年」三組查表結果 */
+        /* 依目前選取的宮位，即時組出「宅命×大運」「大運×流年」「宅命×流年」查表結果 */
         const selectedInfo = computed(() => {
           if (!selectedCell.value) return null;
           const { r, c } = selectedCell.value;
           const isCenter = r === 1 && c === 1;
 
-          // 宮位內若為國字數字，一律轉換為阿拉伯數字再查表
           const baseNum = cnToNum[chart.value.grid[r][c]];
           const periodNum = periodGrid.value[r][c];
           const annualNum = annualGrid.value[r][c];
+          const monthNum = monthGrid.value[r][c];
+          const dayNum = dayGrid.value[r][c];
+          const hourNum = hourGrid.value[r][c];
 
           const dirKey = cellToDirectionKey[`${r},${c}`];
           const direction = isCenter ? null : chart.value.directions[dirKey];
@@ -1629,7 +1962,7 @@
             { label: "宅命 × 流年", a: baseNum, b: annualNum }
           ].map((p) => ({ ...p, data: lookupStarPair(p.a, p.b) }));
 
-          return { isCenter, direction, baseNum, periodNum, annualNum, pairs };
+          return { isCenter, direction, baseNum, periodNum, annualNum, monthNum, dayNum, hourNum, pairs };
         });
 
         const select = (key) => {
@@ -1662,6 +1995,8 @@
           activeKey, showSelector, chart, select, toggleSelector, closeSelector, selectorButtons, baguaMap,
           periodStar, periodGrid, periodOptions, selectPeriod,
           activeYear, annualStar, annualGrid, yearOptions, selectYear,
+          dateStr, shichenIndex, siZhu, yearStarInfo, monthStar, dayStarInfo, hourStar,
+          monthGrid, dayGrid, hourGrid, setNow, SHICHEN,
           selectedCell, selectedInfo, onSelectCell, closePopup,
           numToCn
         };
@@ -1671,9 +2006,11 @@
       <div class="header">
         <div class="eyebrow">紫 白 飛 星</div>
         <h1 class="title">九宮飛星圖</h1>
-        
       </div>
 
+      
+
+      <!-- 大運流年設定與時間控制項 -->
       <div class="control-row">
         <div class="control-group">
           <label class="control-label" for="period-select">大運</label>
@@ -1688,16 +2025,55 @@
           </select>
         </div>
       </div>
+
+      <!-- 時間設定位置：放在「大運流年設定」下方 -->
+      <div class="control-row" style="margin-top: -6px;">
+        <div class="control-group">
+          <label class="control-label">日期</label>
+          <input type="date" class="date-input" v-model="dateStr" @click="e => e.target.showPicker && e.target.showPicker()" />
+        </div>
+        <div class="control-group">
+          <label class="control-label">時辰</label>
+          <select class="control-select" v-model.number="shichenIndex">
+            <option v-for="(s,i) in SHICHEN" :key="i" :value="i">
+              {{ s.name }}（{{ s.range }}）
+            </option>
+          </select>
+        </div>
+        <button class="now-btn" @click="setNow">目前時刻</button>
+      </div>
+
       <div class="control-note">
         <span class="accent">{{ numToCn[periodStar] }}運・{{ numToCn[periodStar] }}入中宮</span>
         <span class="sep">·</span>
         <span class="accent-purple">{{ activeYear }}年・{{ numToCn[annualStar] }}入中（流年星）</span>
       </div>
 
+      <!-- 四柱八字資訊面板（位於九宮圖上方） -->
+      <div class="sizhu-panel" v-if="siZhu">
+        <div class="sizhu-title">四柱八字座標</div>
+        <div class="sizhu-row">
+          <div class="sizhu-card"><div class="role">年柱</div><div class="gz">{{ siZhu.year.label }}</div></div>
+          <div class="sizhu-card"><div class="role">月柱</div><div class="gz">{{ siZhu.month.label }}</div></div>
+          <div class="sizhu-card"><div class="role">日柱</div><div class="gz">{{ siZhu.day.label }}</div></div>
+          <div class="sizhu-card"><div class="role">時柱</div><div class="gz">{{ siZhu.hour.label }}</div></div>
+        </div>
+        <div class="sizhu-meta" v-if="yearStarInfo && dayStarInfo">
+          <span>三元：<b>{{ yearStarInfo.yuan }}</b></span>
+          <span>當運：<b>{{ yearStarInfo.yun }}</b></span>
+          <span>陰陽遁：<b>{{ dayStarInfo.dun === 'yang' ? '陽遁（冬至後）' : '陰遁（夏至後）' }}</b></span>
+          <span>年星：<b>{{ numToCn[yearStarInfo.star] }}入中</b></span>
+          <span>月星：<b>{{ numToCn[monthStar] }}入中</b></span>
+          <span>日星：<b>{{ numToCn[dayStarInfo.star] }}入中</b></span>
+          <span>時星：<b>{{ numToCn[hourStar] }}入中</b></span>
+        </div>
+      </div>
+
       <div class="grid-wrap">
         <transition name="fade-swap" mode="out-in">
           <NineGrid :key="activeKey"
                     :grid="chart.grid" :period-grid="periodGrid" :annual-grid="annualGrid"
+                    :month-grid="monthGrid" :day-grid="dayGrid" :hour-grid="hourGrid"
                     :directions="chart.directions" :sitting="chart.sitting" :facing="chart.facing"
                     :selected-cell="selectedCell"
                     @select-cell="onSelectCell" />
@@ -1738,7 +2114,7 @@
               <button class="popup-close" @click="closePopup" aria-label="關閉">✕</button>
               <div class="info-panel-head">
                 <span class="info-panel-title">{{ selectedInfo.isCenter ? "中宮" : (selectedInfo.direction + "（" + baguaMap[selectedInfo.direction] + "）") }}</span>
-                <span class="info-panel-nums">宅 {{ numToCn[selectedInfo.baseNum] }}・運 {{ numToCn[selectedInfo.periodNum] }}・流 {{ selectedInfo.annualNum }}</span>
+                <span class="info-panel-nums">宅 {{ numToCn[selectedInfo.baseNum] }}・運 {{ numToCn[selectedInfo.periodNum] }}・流 {{ selectedInfo.annualNum }}・月 {{ selectedInfo.monthNum }}・日 {{ selectedInfo.dayNum }}・時 {{ selectedInfo.hourNum }}</span>
               </div>
 
               <div class="wuxing-caption">五行生剋</div>
