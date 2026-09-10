@@ -11,7 +11,7 @@
     :root {
       --ink: #2b2620;
       /* 深墨色：用於一般文字及九宮格數字 */
-      --ink-soft: #6b5f4d;
+      --ink-soft: #533812;
       /* 淺墨色：用於次要的說明文字 */
       --paper: #f3ead6;
       /* 紙張底色：網頁與九宮格的主要淺金黃底色 */
@@ -349,7 +349,7 @@
 
     .cell-dir-tag .dir-tag-main {
       font-family: var(--font-ui);
-      font-size: clamp(9px, 2vw, 10.5px);
+      font-size: clamp(12px, 2vw, 16px);
       letter-spacing: 0.04em;
       color: var(--ink-soft);
       opacity: .62;
@@ -358,7 +358,7 @@
 
     .cell-dir-tag .dir-tag-sub {
       font-family: var(--font-ui);
-      font-size: clamp(9px, 2vw, 10.5px);
+      font-size: clamp(9px, 2vw, 13px);
       letter-spacing: 0.02em;
       color: var(--ink-soft);
       opacity: .42;
@@ -416,6 +416,62 @@
       letter-spacing: 0.1em;
       color: var(--brass-soft);
       white-space: nowrap;
+    }
+
+    /* 切換開關 (Toggle Switch) 樣式 */
+    .switch-group {
+      padding: 6px 12px;
+      user-select: none;
+    }
+
+    .switch-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .switch-label input {
+      display: none;
+    }
+
+    .switch-slider {
+      position: relative;
+      width: 34px;
+      height: 18px;
+      background-color: #120f0b;
+      border: 1px solid #4a4130;
+      border-radius: 9px;
+      transition: background-color .2s ease, border-color .2s ease;
+    }
+
+    .switch-slider::before {
+      content: "";
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      left: 2px;
+      top: 2px;
+      background-color: var(--brass-soft);
+      border-radius: 50%;
+      transition: transform .2s ease, background-color .2s ease;
+    }
+
+    .switch-label input:checked+.switch-slider {
+      background-color: rgba(182, 146, 79, 0.25);
+      border-color: var(--brass);
+    }
+
+    .switch-label input:checked+.switch-slider::before {
+      transform: translateX(16px);
+      background-color: var(--paper);
+    }
+
+    .switch-text {
+      font-family: var(--font-display);
+      font-size: 13px;
+      letter-spacing: 0.05em;
+      color: var(--paper-deep);
     }
 
     /* 自訂下拉選單外觀：移除瀏覽器預設樣式，改用統一的黃銅色系與自繪箭頭 */
@@ -995,7 +1051,7 @@
   <div id="app"></div>
 
   <script>
-    const { createApp, computed, ref, onMounted, onUnmounted } = Vue;
+    const { createApp, computed, ref, toRefs, onMounted, onUnmounted } = Vue;
 
     /* ---------------------------------------------------------
        固定資料表 — 依坐山 key 儲存：坐/朝、九宮格資料、外圍八方位
@@ -1046,14 +1102,14 @@
 
     /* 八方位對應之八卦與五行（固定對照表） */
     const baguaMap = {
-      "北": "坎水-喜砂-中男財庫",
-      "南": "離火-喜水-中女人際",
-      "東": "震木-喜砂-長男事業",
-      "西": "兌金-喜水-少女口舌",
-      "東北": "艮土-喜水-少男學業",
-      "東南": "巽木-喜砂-長女感情",
-      "西北": "乾金-喜水-老父權勢",
-      "西南": "坤土-喜砂-老母家運"
+      "北": "坎水-喜砂-中男-財庫",
+      "南": "離火-喜水-中女-人際",
+      "東": "震木-喜砂-長男-事業",
+      "西": "兌金-喜水-少女-口舌",
+      "東北": "艮土-喜水-少男-學業",
+      "東南": "巽木-喜砂-長女-感情",
+      "西北": "乾金-喜水-老父-權勢",
+      "西南": "坤土-喜砂-老母-家運"
     };
 
     const selectorButtons = [
@@ -1795,7 +1851,16 @@
        hourGrid：流時盤
     ------------------------------------------------------------- */
     const NineGrid = {
-      props: ["grid", "periodGrid", "annualGrid", "monthGrid", "dayGrid", "hourGrid", "selectedCell", "directions", "sitting", "facing"],
+      props: {
+        grid: Array, periodGrid: Array, annualGrid: Array,
+        monthGrid: Array, dayGrid: Array, hourGrid: Array,
+        directions: Object, sitting: String, facing: String,
+        selectedCell: Object,
+        showDetailStars: {
+          type: Boolean,
+          default: true
+        }
+      },
       emits: ["select-cell"],
       setup(props) {
         const numToCn = { 1: "一", 2: "二", 3: "三", 4: "四", 5: "五", 6: "六", 7: "七", 8: "八", 9: "九" };
@@ -1827,7 +1892,8 @@
           const label = dirLabel(r, c);
           return label ? (baguaMap[label] || '') : '';
         };
-        return { numToCn, getStarColorClass, dirLabel, dirClass, dirInfo };
+        const { showDetailStars } = toRefs(props);
+        return { numToCn, getStarColorClass, dirLabel, dirClass, dirInfo, showDetailStars };
       },
       template: `
     <div class="nine-grid">
@@ -1850,17 +1916,19 @@
             <span :class="getStarColorClass(periodGrid[r][c])">{{ numToCn[periodGrid[r][c]] }}</span>
             <span :class="getStarColorClass(annualGrid[r][c])">{{ annualGrid[r][c] }}</span>
           </div>
-          <div class="cell-row-divider"></div>
-          <div class="cell-row-header">
-            <span>月</span>
-            <span>日</span>
-            <span>時</span>
-          </div>
-          <div class="cell-row-value">
-            <span :class="getStarColorClass(monthGrid[r][c])">{{ monthGrid[r][c] }}</span>
-            <span :class="getStarColorClass(dayGrid[r][c])">{{ dayGrid[r][c] }}</span>
-            <span :class="getStarColorClass(hourGrid[r][c])">{{ hourGrid[r][c] }}</span>
-          </div>
+          <template v-if="showDetailStars">
+            <div class="cell-row-divider"></div>
+            <div class="cell-row-header">
+              <span>月</span>
+              <span>日</span>
+              <span>時</span>
+            </div>
+            <div class="cell-row-value">
+              <span :class="getStarColorClass(monthGrid[r][c])">{{ monthGrid[r][c] }}</span>
+              <span :class="getStarColorClass(dayGrid[r][c])">{{ dayGrid[r][c] }}</span>
+              <span :class="getStarColorClass(hourGrid[r][c])">{{ hourGrid[r][c] }}</span>
+            </div>
+          </template>
         </div>
       </template>
     </div>
@@ -1872,6 +1940,7 @@
       setup() {
         const activeKey = ref("south");
         const showSelector = ref(false);
+        const showDetailStars = ref(true);
         const chart = computed(() => charts[activeKey.value]);
 
         /* 大運（1~9）目前選擇，預設九運 */
@@ -1992,7 +2061,7 @@
         });
 
         return {
-          activeKey, showSelector, chart, select, toggleSelector, closeSelector, selectorButtons, baguaMap,
+          activeKey, showSelector, showDetailStars, chart, select, toggleSelector, closeSelector, selectorButtons, baguaMap,
           periodStar, periodGrid, periodOptions, selectPeriod,
           activeYear, annualStar, annualGrid, yearOptions, selectYear,
           dateStr, shichenIndex, siZhu, yearStarInfo, monthStar, dayStarInfo, hourStar,
@@ -2024,10 +2093,17 @@
             <option v-for="y in yearOptions" :key="y" :value="y">{{ y }} 年</option>
           </select>
         </div>
+        <div class="control-group switch-group">
+          <label class="switch-label">
+            <input type="checkbox" v-model="showDetailStars" />
+            <span class="switch-slider"></span>
+            <span class="switch-text">顯示月日時星</span>
+          </label>
+        </div>
       </div>
 
       <!-- 時間設定位置：放在「大運流年設定」下方 -->
-      <div class="control-row" style="margin-top: -6px;">
+      <div class="control-row" style="margin-top: -6px;" v-if="showDetailStars">
         <div class="control-group">
           <label class="control-label">日期</label>
           <input type="date" class="date-input" v-model="dateStr" @click="e => e.target.showPicker && e.target.showPicker()" />
@@ -2050,7 +2126,7 @@
       </div>
 
       <!-- 四柱八字資訊面板（位於九宮圖上方） -->
-      <div class="sizhu-panel" v-if="siZhu">
+      <div class="sizhu-panel" v-if="showDetailStars && siZhu">
         <div class="sizhu-title">四柱八字座標</div>
         <div class="sizhu-row">
           <div class="sizhu-card"><div class="role">年柱</div><div class="gz">{{ siZhu.year.label }}</div></div>
@@ -2076,6 +2152,7 @@
                     :month-grid="monthGrid" :day-grid="dayGrid" :hour-grid="hourGrid"
                     :directions="chart.directions" :sitting="chart.sitting" :facing="chart.facing"
                     :selected-cell="selectedCell"
+                    :show-detail-stars="showDetailStars"
                     @select-cell="onSelectCell" />
         </transition>
       </div>
