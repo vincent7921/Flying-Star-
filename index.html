@@ -18,10 +18,11 @@
       --paper-deep: #e7d9b8;
       /* 深紙色：用於九宮格中心（中宮）的背景色 */
       --paper-line: #cdbb92;
-      /* 紙張格線色：九宮格內部的細線顏色 */
+      /* 紙張格線色：九宮格內部的細線顏色#d80b0f */
       --cinnabar: #d80b0f;
-      /* 朱砂紅：用於座山文字、中宮文字、啟用的按鈕等強調色 */
-      --cinnabar-deep: #d80b0f;
+      /* 朱砂紅：用於座山文字、中宮文字、啟用的按鈕等強調色#d80b0f */
+      --cinnabar2: #b7934f;
+      --cinnabar-deep: #9e7b43;
       /* 深朱砂紅：用於漸層底線或深色朱砂強調 */
       --brass: #b6924f;
       /* 黃銅色：用於外框線與按鈕懸停邊框色 */
@@ -273,7 +274,7 @@
       right: -1.5px;
       height: 8px;
       /* 紅線粗細 */
-      background: linear-gradient(90deg, transparent, var(--cinnabar) 15%, var(--cinnabar-deep) 50%, var(--cinnabar) 85%, transparent);
+      background: linear-gradient(90deg, transparent, var(--cinnabar2) 15%, var(--cinnabar-deep) 50%, var(--cinnabar2) 85%, transparent);
       border-radius: 2px;
       pointer-events: none;
     }
@@ -284,7 +285,7 @@
       background: #1c1812;
       border: 1px solid var(--brass);
       border-radius: 6px;
-      padding: 16px;
+      padding: 8px;
       margin: 0 auto 20px;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
       max-width: 520px;
@@ -309,7 +310,7 @@
       text-align: center;
       border: 1px solid #3a3327;
       border-radius: 5px;
-      padding: 8px 4px;
+      padding: 5px 4px;
       background: #120f0b;
     }
 
@@ -352,7 +353,7 @@
       background: #1c1812;
       border: 1px solid var(--brass);
       border-radius: 6px;
-      padding: 16px;
+      padding: 8px;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
 
@@ -841,22 +842,22 @@
 
     .date-stepper {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       border: 1px solid #4a4130;
       border-top-right-radius: 4px;
       border-bottom-right-radius: 4px;
       overflow: hidden;
-      min-height: 31px;
+      min-height: 40px;
     }
 
     .date-step-btn {
       flex: 1;
-      min-width: 26px;
+      min-width: 40px;
       border: none;
       background-color: #120f0b;
       color: var(--paper);
       cursor: pointer;
-      font-size: 9px;
+      font-size: 15px;
       line-height: 1;
       padding: 0;
       display: flex;
@@ -866,7 +867,8 @@
     }
 
     .date-step-btn:first-child {
-      border-bottom: 1px solid #4a4130;
+      border-bottom: none;                     
+      border-right: 1px solid #4a4130;         
     }
 
     .date-step-btn:hover,
@@ -877,8 +879,8 @@
 
     .now-btn {
       padding: 5px 12px;
-      border: 1px solid var(--cinnabar);
-      color: var(--cinnabar);
+      border: 1px solid #b6924f;
+      color: #b6924f;
       background: transparent;
       border-radius: 4px;
       cursor: pointer;
@@ -889,7 +891,7 @@
     }
 
     .now-btn:hover {
-      background: var(--cinnabar);
+      background: var(--cinnabar2);
       color: #fff8ec;
     }
 
@@ -1066,13 +1068,13 @@
     }
 
     #period-select {
-      color: var(--cinnabar);
-      border-color: rgba(216, 11, 15, 0.4);
+      color: var(--paper);
+      border: 1px solid #4a4130;
     }
 
     #year-select {
-      color: var(--purple);
-      border-color: rgba(138, 107, 181, 0.4);
+      color: var(--paper);
+      border: 1px solid #4a4130;
     }
 
     /* 大運／流年入中說明文字（合併為單行，中間以圓點分隔） */
@@ -1117,9 +1119,9 @@
       letter-spacing: 0.06em;
       padding: 8px 16px;
       border-radius: 20px;
-      border: 1px dashed rgba(216, 11, 15, 0.4);
-      background: rgba(216, 11, 15, 0.08);
-      color: var(--cinnabar);
+      border: 1px dashed rgb(255 210 62 / 47%);
+      background: rgb(255 222 165 / 14%);
+      color: #ffce71;
       cursor: pointer;
       transition: all .2s ease;
     }
@@ -1624,7 +1626,7 @@
     .qz-nature-bad.qz-grade-a { --deity-accent:#ff2f55; --deity-bg:rgba(255,47,85,.18); border-width:1.5px; font-weight:800; box-shadow:inset 0 0 0 1px rgba(255,47,85,.2),0 0 12px rgba(255,47,85,.08); }
     .qz-nature-bad.qz-grade-b { --deity-accent:#ff8a4c; --deity-bg:rgba(255,138,76,.12); }
     .qz-nature-bad.qz-grade-c { --deity-accent:#c7a1aa; --deity-bg:rgba(199,161,170,.08); }
-    .qz-personal { border-style:dashed; box-shadow:inset 3px 0 0 rgba(255,255,255,.75); }
+
     .qz-jianchu { border-color:rgba(96,165,250,.45); color:#93c5fd; background:rgba(96,165,250,.1); min-width:56px; text-align:center; font-weight:700; }
     .qz-owner-panel { background:linear-gradient(145deg,#1a1d3c,#15182f); border:1px solid #2a2d4c; border-radius:12px; padding:18px; margin:25px 0; }
     .qz-owner-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
@@ -21032,7 +21034,7 @@
 })();
 </script>
 <script>
-    const { createApp, computed, ref, watch, toRefs, onMounted, onUnmounted } = Vue;
+    const { createApp, computed, ref, watch, toRefs, onMounted, onUnmounted, nextTick } = Vue;
 
     /* ---------------------------------------------------------
        固定資料表 — 依坐山 key 儲存：坐/朝、九宮格資料、外圍八方位
@@ -21944,10 +21946,19 @@
     // 同步日期／時辰變更到擇日神煞（十二建除、吉神、凶神）
     // Vue v-model 更新後觸發，確保神煞資料與畫面日期保持一致。
     watch([dateStr, shichenIndex], () => {
+        console.log('日期watch觸發了', dateStr.value); 
         setTimeout(() => {
             window.__qzRefreshDeities?.();
         }, 0);
     });
+    
+    // 開關「顯示月日時星」重新打開時，等畫面把 qz-integrated-panel 重新畫出來後，
+    // 再刷新一次十二建除／吉神／凶神，避免內容空白。
+    watch(showDetailStars, (val) => {
+        if (val) {
+            nextTick(() => window.__qzRefreshDeities?.());
+        }
+    })
 
         const parsedDate = computed(() => {
           if (!dateStr.value) return { y: currentYear, m: 1, d: 1 };
@@ -22053,8 +22064,9 @@
 
 
         const initQzDeityIntegration = () => {
+          console.log('[QZ] initQzDeityIntegration 開始執行');
           const bridge = window.__qzDeityBridge;
-          if (!bridge) return;
+          if (!bridge) { console.log('[QZ] bridge 不存在，提前結束'); return; }
           const dateEl = document.getElementById('main-date-input');
           const hourEl = document.getElementById('main-hour-select');
           const ownerSave = document.getElementById('qz-owner-save');
@@ -22185,13 +22197,14 @@
                 gender: getOwnerGender(2)
               }
             };
-            const snapshot = bridge.refresh(dateEl?.value, hourEl?.value, owners);
+            const snapshot = bridge.refresh(dateStr.value, shichenIndex.value, owners);
             renderQzDeities(snapshot, bridge, modal);
           };
           
 
 
           window.__qzRefreshDeities = sync;
+          console.log('[QZ] window.__qzRefreshDeities 賦值完成');
           dateEl?.addEventListener('change', () => setTimeout(sync, 0));
           hourEl?.addEventListener('change', () => setTimeout(sync, 0));
           ownerSave?.addEventListener('click', () => { sync(); ownerModalSnapshot = null; closeOwnerModal(); });
@@ -22310,8 +22323,8 @@
                    @change="e => { dateStr = e.target.value; window.__qzRefreshDeities && window.__qzRefreshDeities(); }"
                    @click="e => { try { e.target.showPicker && e.target.showPicker(); } catch (err) {} }" />
             <div class="date-stepper">
-              <button type="button" class="date-step-btn" @click="shiftDate(1)" aria-label="下一日">▲</button>
-              <button type="button" class="date-step-btn" @click="shiftDate(-1)" aria-label="上一日">▼</button>
+              <button type="button" class="date-step-btn" @click="shiftDate(-1)" aria-label="上一日">▲</button>
+              <button type="button" class="date-step-btn" @click="shiftDate(1)" aria-label="下一日">▼</button>
             </div>
           </div>
         </div>
@@ -22322,8 +22335,12 @@
               {{ s.name }}（{{ s.range }}）
             </option>
           </select>
+          <button class="now-btn" @click="setNow">目前時刻</button>
+
+          <button type="button" class="now-btn" id="qz-owner-modal-open">設定命主資料</button>
+
         </div>
-        <button class="now-btn" @click="setNow">目前時刻</button>
+        
       </div>
 
       <div class="control-note">
@@ -22353,7 +22370,7 @@
       </div>
 
       <!-- 求真：十二建除／吉神／凶神／命主神煞，與上方四柱八字採同一張卡片語言 -->
-      <section class="qz-integrated-panel" id="qz-integrated-panel">
+      <section class="qz-integrated-panel" id="qz-integrated-panel"  v-if="showDetailStars">
         <div class="qz-integrated-title">擇日神煞</div>
 
         <div class="qz-integrated-section">
@@ -22371,9 +22388,7 @@
           <div class="qz-integrated-buttons" id="qz-inauspicious-list"></div>
         </div>
 
-        <div class="qz-owner-trigger-row">
-          <button type="button" class="now-btn" id="qz-owner-modal-open">設定命主資料</button>
-        </div>
+
       </section>
       </div>
 
