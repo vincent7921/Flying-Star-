@@ -1771,12 +1771,25 @@
 <body>
 
   <div id="qz-deity-engine" aria-hidden="true" style="position:fixed;left:-100000px;top:-100000px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;">
-    <select id="year-select"><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option></select>
-    <select id="month-select"><option vlaue="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
+    <select id="year-select"></select>
+    <select id="month-select"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
     <input id="day-input" value="1" />
     <select id="hour-select"><option value="0">子</option><option value="1">丑</option><option value="2">寅</option><option value="3">卯</option><option value="4">辰</option><option value="5">巳</option><option value="6">午</option><option value="7">未</option><option value="8">申</option><option value="9">酉</option><option value="10">戌</option><option value="11">亥</option></select>
-    <select id="purple-year-select"><option value="2026">2026</option></select><select id="purple-month-select"><option value="1">1</option></select><input id="purple-day-input" value="1" /><select id="purple-hour-select"><option value="0">子</option></select>
-    <button id="top-profile-open"></button><button id="purple-profile-open"></button><button id="top-owner1-open"></button><button id="top-owner2-open"></button><button id="purple-owner1-open"></button><button id="purple-owner2-open"></button>
+    <select id="purple-year-select"></select><select id="purple-month-select"><option value="1">1</option></select><input id="purple-day-input" value="1" /><select id="purple-hour-select"><option value="0">子</option></select>
+    <script>
+    /* 擇日引擎年份選單：曆法為即時運算，不應限制年份。涵蓋 1900–2100，避免選到範圍外年份時 select.value 變空字串而導致「無可用資料」。 */
+    (function () {
+      ['year-select', 'purple-year-select'].forEach(function (id) {
+        var sel = document.getElementById(id);
+        if (!sel) return;
+        var html = '';
+        for (var y = 1900; y <= 2100; y++) html += '<option value="' + y + '">' + y + '</option>';
+        sel.innerHTML = html;
+        sel.value = '2026';
+      });
+    })();
+    </script>
+        <button id="top-profile-open"></button><button id="purple-profile-open"></button><button id="top-owner1-open"></button><button id="top-owner2-open"></button><button id="purple-owner1-open"></button><button id="purple-owner2-open"></button>
     <div id="owner-profile-page"></div><button id="owner-profile-back"></button><button id="owner-profile-cancel"></button><button id="owner-profile-save"></button>
     <div id="top-owner1-summary"></div><div id="top-owner2-summary"></div><div id="purple-owner1-summary"></div><div id="purple-owner2-summary"></div>
     <div id="owner1-editor"></div><div id="owner2-editor"></div>
