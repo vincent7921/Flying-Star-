@@ -10919,6 +10919,10 @@
                     "method": "看命主年干與當天日干是否形成天干五合。 甲逢己。 乙逢庚。 丙逢辛。 丁逢壬。 戊逢癸。 己逢甲。 庚逢乙。 辛逢丙。 壬逢丁。 癸逢戊。",
                     "intro": "天干五合主和合、配合、人情、合作、順勢。 它偏「天干之合」，重點在人事、溝通、關係、合作意願。"
           },
+          "命主五合月": {
+                    "method": "看命主出生年干與當月月干（節氣月，以節為界）是否形成天干五合。 甲逢己。 乙逢庚。 丙逢辛。 丁逢壬。 戊逢癸。 己逢甲。 庚逢乙。 辛逢丙。 壬逢丁。 癸逢戊。 例如命主年干為甲，遇己月（月柱天干為己）即為命主五合月；整個節氣月內每一天都適用。",
+                    "intro": "命主五合月的意義與五合日相近，主和合、配合、人情、合作、順勢。 它偏「天干之合」，重點在人事、溝通、關係、合作意願。 與五合日的差別在於，五合日只落在單一日子，五合月則是整個節氣月的大環境都與命主相合，可作為婚嫁、合作、簽約、人際往來等事項的月份輔助加分，但不宜單獨決定日子的吉凶。"
+          },
           "天乙貴人": {
                     "method": "按命主年干查。 甲、戊、庚，貴人在丑、未。 乙、己，貴人在子、申。 丙、丁，貴人在亥、酉。 壬、癸，貴人在卯、巳。 辛，貴人在午、寅。 當天日支落在命主天乙貴人位，即為天乙貴人。",
                     "intro": "天乙貴人是大吉貴人，主貴人扶持、逢凶化吉、有人相助、事情容易得助力。 它本身不專屬桃花，也不專屬財運，而是通用型貴人星。"
@@ -11709,6 +11713,14 @@
                               "和合"
                     ]
           },
+          "命主五合月": {
+                    "nature": "吉",
+                    "grade": "A",
+                    "tags": [
+                              "命主",
+                              "和合"
+                    ]
+          },
           "天乙貴人": {
                     "nature": "吉",
                     "grade": "A",
@@ -12190,11 +12202,12 @@
             "三合日": 20,
             "六合日": 30,
             "天干五合日": 40,
+            "命主五合月": 45,
             "命祿": 50
         };
         const inauspiciousPairOrderRank = {"歲破": 10, "月破": 20};
         const dedicatedSceneTags = new Set(["陰宅專用", "婚嫁專用", "安床專用", "女命專用", "亡者年命專用"]);
-        const coreDeityNames = new Set(["歲煞", "三合大局", "三合日", "六合日", "天干五合日", "天乙貴人", "命祿", "年干五合", "年支六合"]);
+        const coreDeityNames = new Set(["歲煞", "三合大局", "三合日", "六合日", "天干五合日", "命主五合月", "天乙貴人", "命祿", "年干五合", "年支六合"]);
         const coreGoodKeywords = ["通用", "大事", "化凶", "化煞", "重新開始", "順時"];
         const coreBadKeywords = ["通用", "大事忌", "大事慎", "重凶", "破局", "閉塞", "無力", "氣絕", "啟動忌", "開展忌", "災阻", "衝突"];
         const broadKeywords = ["祈福", "和合", "合作", "成局", "布局", "輔助", "清理", "解除", "護佑", "民俗慎用", "不穩"];
@@ -12609,6 +12622,7 @@
                 if (personalSanHe.full) recordPersonalDeity(auspicious, owner, "三合日", "命主吉神", 50);
                 else if (personalSanHe.half) recordPersonalDeity(auspicious, owner, "半三合", "命主吉神", 55);
                 if (stemCombineMap[natal.yearStem] === info.dayStem) recordPersonalDeity(auspicious, owner, "天干五合日", "命主吉神", 60);
+                if (stemCombineMap[natal.yearStem] === info.monthStem) recordPersonalDeity(auspicious, owner, "命主五合月", "命主吉神", 62);
                 if (personalTianYiMap[natal.yearStem]?.includes(info.dayBranch)) recordPersonalDeity(auspicious, owner, "天乙貴人", "命主吉神", 70);
                 if (personalWenChangMap[natal.yearStem]?.includes(info.dayBranch)) recordPersonalDeity(auspicious, owner, "文昌貴人", "命主吉神", 80);
                 if (yiMaMap[natal.yearBranch] === info.dayBranch) recordPersonalDeity(auspicious, owner, "驛馬", "命主吉神", 90);
