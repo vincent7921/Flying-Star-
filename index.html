@@ -1723,6 +1723,24 @@
       line-height: 1.75;
       font-size: 12.5px;
     }
+    .qz-deity-table {
+      width: 100%;
+      margin-top: 10px;
+      border-collapse: collapse;
+      font-size: 12px;
+      line-height: 1.5;
+      text-align: center;
+    }
+    .qz-deity-table th, .qz-deity-table td {
+      border: 1px solid var(--paper-line);
+      padding: 5px 4px;
+      color: var(--ink);
+    }
+    .qz-deity-table th {
+      color: var(--brass);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
     .qz-lookup-content { max-width: 420px; }
     .qz-lookup-form { display: flex; flex-direction: column; gap: 12px; }
     .qz-lookup-field { display: flex; flex-direction: column; gap: 4px; }
@@ -10729,6 +10747,10 @@
                     "method": "歲破依照流年地支查日支，年支所沖的日支就是歲破。子年逢午日，丑年逢未日，寅年逢申日，卯年逢酉日，辰年逢戌日，巳年逢亥日，午年逢子日，未年逢丑日，申年逢寅日，酉年逢卯日，戌年逢辰日，亥年逢巳日，皆為歲破。",
                     "intro": "歲破代表流年氣場被沖破，屬於年度層面的破敗之日。它比一般小凶更重，重大事項如開業、婚嫁、入宅、動土、安宅、修造、布風水局，都不建議選在歲破日。"
           },
+          "歲破月": {
+                    "method": "歲破月依照流年地支查節氣月建，年支所沖的月支就是歲破月。子年逢午月，丑年逢未月，寅年逢申月，卯年逢酉月，辰年逢戌月，巳年逢亥月，午年逢子月，未年逢丑月，申年逢寅月，酉年逢卯月，戌年逢辰月，亥年逢巳月，皆為歲破月。月份以節氣月（以「節」為界）計算，整個節氣月內每一天都適用。",
+                    "intro": "歲破月代表流年氣場在該月被沖破，屬於年度層面的破敗之月。它比一般小凶更重，重大事項如開業、婚嫁、入宅、動土、安宅、修造、布風水局，都不建議選在歲破月。與歲破日不同的是，歲破月是整個節氣月的大環境受到年支相沖，而不是單一日子。"
+          },
           "四絕": {
                     "method": "四絕日依照節氣查，是立春、立夏、立秋、立冬的前一天。立春前一日、立夏前一日、立秋前一日、立冬前一日，皆為四絕日。",
                     "intro": "四絕代表季節之氣將盡未生，舊氣已絕、新氣未起，氣場不穩。它不適合做啟動、開業、婚嫁、入宅、安宅、動土等大事，屬於大事慎用日。"
@@ -10947,9 +10969,18 @@
                     "method": "申、子、辰命，華蓋在辰。 寅、午、戌命，華蓋在戌。 巳、酉、丑命，華蓋在丑。 亥、卯、未命，華蓋在未。 當天日支落在命主華蓋位，即為華蓋。",
                     "intro": "華蓋主才華、靈性、藝術、宗教、玄學、清高、孤獨、精神性。 吉用時，利學術、修行、藝術、靈性、專業研究。 凶用時，容易孤僻、冷清、疏離、人際距離感強。"
           },
-          "年支六沖": {
-                    "method": "看當天日支是否沖命主年支。 子午沖。 丑未沖。 寅申沖。 卯酉沖。 辰戌沖。 巳亥沖。",
-                    "intro": "年支六沖主年命受沖，代表當日氣場與命主外在根基、生肖年命相沖。 容易出現不順、波動、衝突、變動、氣場不合。"
+          "歲破日(年支六沖)": {
+                    "method": "歲破日依照命主生年地支查日支，命主生年地支所沖的日支就是歲破日。子年生人逢午日，丑年生人逢未日，寅年生人逢申日，卯年生人逢酉日，辰年生人逢戌日，巳年生人逢亥日，午年生人逢子日，未年生人逢丑日，申年生人逢寅日，酉年生人逢卯日，戌年生人逢辰日，亥年生人逢巳日，皆為歲破日。",
+                    "intro": "歲破日代表命主生年的根基氣場在當日被沖破，屬於個人年命層面的破敗之日。它比一般小凶更重，重大事項如開業、婚嫁、入宅、動土、安宅、修造、布風水局，命主本人都不建議選在歲破日。此項也就是俗稱的年支六沖，容易出現不順、波動、衝突、變動、氣場不合。"
+          },
+          "歲破月": {
+                    "method": "歲破月依照命主生年地支查節氣月建，命主生年地支所沖的月支就是歲破月。子年生人逢午月，丑年生人逢未月，寅年生人逢申月，卯年生人逢酉月，辰年生人逢戌月，巳年生人逢亥月，午年生人逢子月，未年生人逢丑月，申年生人逢寅月，酉年生人逢卯月，戌年生人逢辰月，亥年生人逢巳月，皆為歲破月。月份以節氣月（以「節」為界）計算，整個節氣月內每一天都適用。",
+                    "intro": "歲破月代表命主生年的根基氣場在該月被沖破，屬於個人年命層面的破敗之月。它比一般小凶更重，重大事項如開業、婚嫁、入宅、動土、安宅、修造、布風水局，命主本人都不建議選在歲破月。與歲破日不同的是，歲破月是整個節氣月的大環境與命主生年相沖，而不是單一日子。"
+          },
+          "三殺日": {
+                    "method": "看命主生年地支，再對照當天日支。寅午戌年生的人，逢丑日為三殺日。申子辰年生的人，逢未日為三殺日。亥卯未年生的人，逢戌日為三殺日。巳酉丑年生的人，逢辰日為三殺日。",
+                    "intro": "三殺日會帶來橫禍、重病、血光、人丁損傷。",
+                    "table": {"headers": ["年支", "歲煞", "災煞", "劫煞", "三煞總方位"], "rows": [["寅午戌", "丑", "子", "亥", "北方"], ["巳酉丑", "辰", "卯", "寅", "東方"], ["申子辰", "未", "午", "巳", "南方"], ["亥卯未", "戌", "酉", "申", "西方"]]}
           },
           "日支六沖": {
                     "method": "看當天日支是否沖命主八字日支。 子午沖。 丑未沖。 寅申沖。 卯酉沖。 辰戌沖。 巳亥沖。",
@@ -11624,6 +11655,14 @@
                               "大事忌"
                     ]
           },
+          "歲破月": {
+                    "nature": "凶",
+                    "grade": "A",
+                    "tags": [
+                              "破局",
+                              "大事忌"
+                    ]
+          },
           "歸忌": {
                     "nature": "凶",
                     "grade": "B",
@@ -11792,12 +11831,21 @@
                               "女命專用"
                     ]
           },
-          "年支六沖": {
+          "歲破日(年支六沖)": {
                     "nature": "凶",
                     "grade": "A",
                     "tags": [
                               "命主",
-                              "六沖",
+                              "破局",
+                              "大事忌"
+                    ]
+          },
+          "三殺日": {
+                    "nature": "凶",
+                    "grade": "A",
+                    "tags": [
+                              "命主",
+                              "破局",
                               "大事忌"
                     ]
           },
@@ -11960,7 +12008,7 @@
         };
         const inauspiciousPriority = {
             "si-jue": 10, "si-li": 11,
-            "sui-po": 20, "yue-po": 21, "year-san-sha-歲煞": 22,
+            "sui-po": 20, "yue-po": 21, "year-san-sha-歲煞": 22, "sui-po-yue": 23,
             "year-san-sha-年劫煞": 30, "year-san-sha-年災煞": 31,
             "month-san-sha-月劫煞": 33, "month-san-sha-月災煞": 34, "month-san-sha-月煞": 35,
             "si-fei": 40, "si-qiong": 41, "si-hao": 42,
@@ -12053,6 +12101,7 @@
         const personalGuChenMap = {亥:"寅", 子:"寅", 丑:"寅", 寅:"巳", 卯:"巳", 辰:"巳", 巳:"申", 午:"申", 未:"申", 申:"亥", 酉:"亥", 戌:"亥"};
         const personalGuaSuMap = {亥:"戌", 子:"戌", 丑:"戌", 寅:"丑", 卯:"丑", 辰:"丑", 巳:"辰", 午:"辰", 未:"辰", 申:"未", 酉:"未", 戌:"未"};
         const personalWangShenMap = {申:"亥", 子:"亥", 辰:"亥", 亥:"寅", 卯:"寅", 未:"寅", 寅:"巳", 午:"巳", 戌:"巳", 巳:"申", 酉:"申", 丑:"申"};
+        const personalSanShaMap = {寅:"丑", 午:"丑", 戌:"丑", 申:"未", 子:"未", 辰:"未", 亥:"戌", 卯:"戌", 未:"戌", 巳:"辰", 酉:"辰", 丑:"辰"};
         const stemElementMap = {甲:"木", 乙:"木", 丙:"火", 丁:"火", 戊:"土", 己:"土", 庚:"金", 辛:"金", 壬:"水", 癸:"水"};
         const elementOvercomesMap = {木:"土", 土:"水", 水:"火", 火:"金", 金:"木"};
         const femaleDaLiMonthMap = {子:[6,12], 午:[6,12], 丑:[5,11], 未:[5,11], 寅:[2,8], 申:[2,8], 卯:[1,7], 酉:[1,7], 辰:[4,10], 戌:[4,10], 巳:[3,9], 亥:[3,9]};
@@ -12205,7 +12254,7 @@
             "命主五合月": 45,
             "命祿": 50
         };
-        const inauspiciousPairOrderRank = {"歲破": 10, "月破": 20};
+        const inauspiciousPairOrderRank = {"歲破": 10, "歲破月": 15, "月破": 20};
         const dedicatedSceneTags = new Set(["陰宅專用", "婚嫁專用", "安床專用", "女命專用", "亡者年命專用"]);
         const coreDeityNames = new Set(["歲煞", "三合大局", "三合日", "六合日", "天干五合日", "命主五合月", "天乙貴人", "命祿", "年干五合", "年支六合"]);
         const coreGoodKeywords = ["通用", "大事", "化凶", "化煞", "重新開始", "順時"];
@@ -12460,6 +12509,7 @@
             if (siQiongMap[season]?.includes(info.dayPillar)) recordDeity(inauspicious, "si-qiong", "四窮", "凶神", "按四季取四窮，當日柱符合。", "慎用重要事項。");
             if (siHaoMap[season]?.includes(info.dayPillar)) recordDeity(inauspicious, "si-hao", "四耗", "凶神", "按四季取四耗，當日柱符合。", "慎財務耗散之事。");
             if (clashMap[info.yearBranch] === info.dayBranch) recordDeity(inauspicious, "sui-po", "歲破", "凶神", "日支沖年支。", "忌重大開端。");
+            if (clashMap[info.yearBranch] === info.monthBranch) recordDeity(inauspicious, "sui-po-yue", "歲破月", "凶神", "月支沖年支。", "忌重大開端。");
             if (clashMap[info.monthBranch] === info.dayBranch) recordDeity(inauspicious, "yue-po", "月破", "凶神", "日支沖月支。", "忌重大開端。");
             if (monthPunishmentMap[info.monthBranch] === info.dayBranch) recordDeity(inauspicious, "yue-xing", "月刑", "凶神", "月支取刑，當日日支符合。", "主刑傷阻滯。");
             if (monthHarmMap[info.monthBranch] === info.dayBranch) recordDeity(inauspicious, "yue-hai", "月害", "凶神", "月支取害，當日日支符合。", "主相害不和。");
@@ -12630,7 +12680,9 @@
                 if (personalJiangXingMap[natal.yearBranch] === info.dayBranch) recordPersonalDeity(auspicious, owner, "將星", "命主吉神", 110);
                 if (personalHuaGaiMap[natal.yearBranch] === info.dayBranch) recordPersonalDeity(auspicious, owner, "華蓋", "命主吉神", 120);
 
-                if (clashMap[natal.yearBranch] === info.dayBranch) recordPersonalDeity(inauspicious, owner, "年支六沖", "命主凶神", 10);
+                if (clashMap[natal.yearBranch] === info.dayBranch) recordPersonalDeity(inauspicious, owner, "歲破日(年支六沖)", "命主凶神", 10);
+                if (clashMap[natal.yearBranch] === info.monthBranch) recordPersonalDeity(inauspicious, owner, "歲破月", "命主凶神", 12, {displayMeta: {tags: ["命主", "破局", "大事忌"]}});
+                if (personalSanShaMap[natal.yearBranch] === info.dayBranch) recordPersonalDeity(inauspicious, owner, "三殺日", "命主凶神", 15);
                 if (clashMap[natal.dayBranch] === info.dayBranch) recordPersonalDeity(inauspicious, owner, "日支六沖", "命主凶神", 20);
                 if (clashMap[natal.dayBranch] === info.dayBranch && stemsOvercomeEachOther(natal.dayStem, info.dayStem)) recordPersonalDeity(inauspicious, owner, "日柱天克地沖", "命主凶神", 30);
                 const huiTouBranches = huiTouGongMap[natal.yearBranch];
@@ -13156,9 +13208,19 @@
           inauspicious: read('inauspicious-deities', '凶神')
         };
       },
+      buildTable(table) {
+        if (!table || !table.headers || !table.rows) return null;
+        const tbl = document.createElement('table');
+        tbl.className = 'qz-deity-table';
+        const thead = tbl.createTHead().insertRow();
+        table.headers.forEach(h => { const th = document.createElement('th'); th.textContent = h; thead.appendChild(th); });
+        const tbody = tbl.createTBody();
+        table.rows.forEach(r => { const tr = tbody.insertRow(); r.forEach(c => { tr.insertCell().textContent = c; }); });
+        return tbl;
+      },
       detail(name, nature) {
         const detail = deityDetailRegistry[name] || deityReferenceDetails[name] || ownerDeityReferenceDetails[name];
-        return detail ? { method: detail.method || '此項查法資料暫缺。', intro: detail.intro || '此項介紹資料暫缺。' } : {
+        return detail ? { method: detail.method || '此項查法資料暫缺。', intro: detail.intro || '此項介紹資料暫缺。', table: detail.table || null } : {
           method: '此項查法資料暫缺。', intro: '此項介紹資料暫缺。'
         };
       }
@@ -14523,6 +14585,12 @@
                 $('qz-modal-title').textContent=item.name;
                 $('qz-modal-method').textContent=detail.method;
                 $('qz-modal-intro').textContent=detail.intro;
+                const tableBox = $('qz-modal-table');
+                if (tableBox) {
+                  tableBox.innerHTML = '';
+                  const tbl = bridge.buildTable(detail.table);
+                  if (tbl) tableBox.appendChild(tbl);
+                }
                 modal?.classList.add('open');
               });
               box.appendChild(btn);
@@ -14782,7 +14850,7 @@
         <div class="qz-modal-content" role="dialog" aria-modal="true">
           <div class="qz-modal-head"><h3 id="qz-modal-title"></h3><button type="button" class="qz-modal-close" id="qz-modal-close">×</button></div>
           <h4>查法</h4><p id="qz-modal-method"></p>
-          <h4>介紹</h4><p id="qz-modal-intro"></p>
+          <h4>介紹</h4><p id="qz-modal-intro"></p><div id="qz-modal-table"></div>
         </div>
       </div>
 
